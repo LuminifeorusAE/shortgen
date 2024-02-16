@@ -1,0 +1,25 @@
+<!-- templates/index.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <h2>Welcome to the Admin Panel!</h2>
+    <div>
+        <h3>Videos</h3>
+        <ul>
+            {% for video in videos %}
+            <li>{{ video.title }} - Likes: {{ video.likes }}, Views: {{ video.views }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h3>Social Network Metrics</h3>
+        <ul>
+            <li>TikTok Subscribers: {{ tiktok_subscribers }}</li>
+            <li>Instagram Followers: {{ instagram_followers }}</li>
+            <li>YouTube Subscribers: {{ youtube_subscribers }}</li>
+        </ul>
+    </div>
+</section>
+{% endblock %}
