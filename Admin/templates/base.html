@@ -11,8 +11,14 @@
     </header>
     <nav>
         <ul>
-            <li><a href="/">Home</a></li>
+            <!-- Add a link to navigate to the index page -->
+            <li><a href="{{ url_for('index') }}">Videos</a></li>
             <!-- Add more navigation links here as needed -->
+        </ul>
+    </nav>
+                <li>TikTok Subscribers: {{ tiktok_subscribers }}</li>
+                <li>Instagram Followers: {{ instagram_followers }}</li>
+                <li>YouTube Subscribers: {{ youtube_subscribers }}</li>
         </ul>
     </nav>
     <main>

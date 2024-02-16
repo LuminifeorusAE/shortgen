@@ -21,10 +21,11 @@ class Video(db.Model):
     youtube_subscribers = db.Column(db.Integer, default=0)
 
 # Routes
-@app.route('/')
+@app.route('/videos')
 def index():
     videos = Video.query.all()
     return render_template('index.html', videos=videos)
+
 @app.route('/base', methods=['GET', 'POST'])
 def base():
     if request.method == 'GET':
