@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Video Index</title>
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -15,15 +15,23 @@
         <h2>Videos</h2>
         <div class="list-group">
             {% for video in videos %}
-            <a href="#" class="list-group-item list-group-item-action">
+            <div class="list-group-item">
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{ video.title }}</h5>
                     <small>Likes: {{ video.likes }}, Views: {{ video.views }}</small>
                 </div>
                 <p class="mb-1">{{ video.description }}</p>
-            </a>
+                <!-- Delete button -->
+                <form action="{{ url_for('delete', video_id=video.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </div>
             {% endfor %}
         </div>
+        <!-- Create Video button -->
+        <form action="{{ url_for('create_video_route') }}" method="POST" style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">Create Video</button>
+        </form>
     </main>
     <footer class="bg-dark text-white p-4 mt-4">
         <p class="text-center">&copy; 2024 Video Gallery</p>
