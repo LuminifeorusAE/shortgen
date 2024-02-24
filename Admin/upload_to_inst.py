@@ -1,63 +1,101 @@
-# Import necessary libraries
-import time
 import requests
 import json
+import time
 
-# Function to upload video to Instagram
-def upload_video(video_url, access_token, ig_user_id):
-    post_url = "https://graph.facebook.com/v10.0/{}/media".format(ig_user_id)
-    payload = {
-        "media_type": "REELS",
-        "video_url": video_url,
-        "caption": "instagram post",
-        "access_token": access_token
+graph_url = 'https://graph.facebook.com/v19.0/'
+
+def post_reel(caption='Test Caption', media_type='REELS', share_to_feed='', thumb_offset='',
+              video_url='https://davidtadevosyan.publit.io/file/second-largest-task.mp4'):
+    with open('graph_api_param.json', 'r') as f:
+        config = json.load(f)
+    
+    access_token = config['access_token']
+    instagram_account_id = config['instagram_account_id']
+    
+    url = graph_url + instagram_account_id + '/media'
+    param = {
+        'access_token': access_token,
+        'caption': caption,
+        'media_type': media_type,
+        'share_to_feed': share_to_feed,
+        'thumb_offset': thumb_offset,
+        'video_url': video_url
     }
-    response = requests.post(post_url, data=payload).json()
-    print(response)  # Print the response for debugging purposes
-    return response
+    try:
+        response = requests.post(url, params=param)
+        response_json = response.json()
+        print("\nResponse from post_reel:", response_json)
+        return response_json
+    except requests.RequestException as e:
+        print("Error posting reel:", e)
+        return None
 
-# Function to get status code
-def get_status_code(ig_container_id, access_token):
-    graph_url = 'https://graph.facebook.com/v18.0/'
+def status_of_upload(ig_container_id=''):
+    with open('graph_api_param.json', 'r') as f:
+        config = json.load(f)
+    
+    access_token = config['access_token']
+    
     url = graph_url + ig_container_id
-    params = {
+    param = {
         'access_token': access_token,
         'fields': 'status_code'
     }
-    response = requests.get(url, params=params).json()
-    return response.get('status_code')  # Use .get() to safely access the value
+    try:
+        response = requests.get(url, params=param)
+        response_json = response.json()
+        print("\nResponse from status_of_upload:", response_json)
+        return response_json
+    except requests.RequestException as e:
+        print("Error getting upload status:", e)
+        return None
 
-# Function to publish video to Instagram
-def publish_video(results, access_token, ig_user_id):
-    if 'id' in results:
-        creation_id = results['id']
-        second_url = "https://graph.facebook.com/v18.0/{}/media_publish".format(ig_user_id)
-        second_payload = {
-            "creation_id": creation_id,
-            "access_token": access_token
-        }
-        response = requests.post(second_url, data=second_payload).json()
-        print(response)  # Print the response for debugging purposes
-        print("Video Published to Instagram")
-    else:
-        print("Video not published")
+def publish_container(creation_id=''):
+    with open('graph_api_param.json', 'r') as f:
+        config = json.load(f)
+    
+    access_token = config['access_token']
+    instagram_account_id = config['instagram_account_id']
+    
+    url = graph_url + instagram_account_id + '/media_publish'
+    param = {
+        'access_token': access_token,
+        'creation_id': creation_id
+    }
+    try:
+        response = requests.post(url, params=param)
+        response_json = response.json()
+        print("\nResponse from publish_container:", response_json)
+        return response_json
+    except requests.RequestException as e:
+        print("Error publishing container:", e)
+        return None
 
-# Main script
+# Run functions
 if __name__ == "__main__":
-    video_url = "https://davidtadevosyan.publit.io/file/second-largest-task.mp4"
-    access_token = 'EAATlJuWNRjIBO1BOoCt7jFlymSKGfqo5u02FoVf2edKG1CmKBDVvvm43QXdFJr4SA4Tx88hGp3qDOZBQeHc7PLp9M2FknQWvkg0b3PsBn94Ib5jFXWZBFvqi97v6W4okZCFmflsXgTcgE2eVZAiCt1upT761rZAqJse1T9mMMiXl5t7Nc1P0RTlaJ'
-    ig_user_id = "17841464783727454"
-
-    res = upload_video(video_url, access_token, ig_user_id)
-    print("Please wait for some time...")
-    print("Uploading is still in progress")
-    time.sleep(10)
-
-    # Check if 'id' exists in the response before accessing it
-    if 'id' in res:
-        ig_container_id = res['id']
-        status_code = get_status_code(ig_container_id, access_token)
-        print("Status code:", status_code)
-        publish_video(res, access_token, ig_user_id)
-    else:
-        print("Upload failed, 'id' not found in response.")
+    response_post_reel = post_reel()
+    if response_post_reel:
+        ig_container_id = response_post_reel.get('id')
+        if ig_container_id:
+            max_retries = 10  # Adjust as needed
+            retries = 0
+            while retries < max_retries:
+                response_status_of_upload = status_of_upload(ig_container_id)
+                if response_status_of_upload and response_status_of_upload.get('status_code') == 'FINISHED':
+                    response_publish_container = publish_container(ig_container_id)
+                    if response_publish_container:
+                        print("Reel successfully published!")
+                    else:
+                        print("Error publishing reel.")
+                    break  # Exit the loop if publishing was successful
+                elif response_status_of_upload and response_status_of_upload.get('status_code') == 'IN_PROGRESS':
+                    print("Upload still in progress. Waiting for 10 seconds...")
+                    time.sleep(10)  # Wait for 10 seconds before checking again
+                    retries += 1
+                else:
+                    print("Error getting upload status. Aborting.")
+                    break
+            else:
+                print("Upload not finished within the specified number of retries.")
+        else:
+            print("Error: Missing Instagram container ID.")
