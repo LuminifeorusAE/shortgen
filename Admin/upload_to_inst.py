@@ -10,7 +10,7 @@ class InstagramAPI:
             self.config = json.load(f)
 
     def post_reel(self, caption='Test Caption', media_type='REELS', share_to_feed='', thumb_offset='',
-                  video_url='https://davidtadevosyan.publit.io/file/second-largest-task.mp4'):
+                  video_url='https://davidtadevosyan.publit.io/file/roll_dice_task.mp4'):
         # Post a reel on Instagram
         access_token = self.config['access_token']
         instagram_account_id = self.config['instagram_account_id']
