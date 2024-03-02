@@ -1,24 +1,31 @@
-from OAuth_autorization import authenticate_and_get_youtube_service
-from OAuth_autorization import upload_videos_with_task
+from OAuth_autorization import authenticate_and_get_youtube_service, upload_videos_with_task
 from bot_1_0_2 import main 
 from upload_to_inst import InstagramAPI
+from basic_upload import tik_tok_upload
 
-
-
-#bot
-def bot():
-    main()
-    """!!!Make this functions OOP !!!"""
+# Function for YouTube bot
+def run_youtube_bot():
     youtube_service = authenticate_and_get_youtube_service()
     upload_videos_with_task(youtube_service)
-    # Create an instance of the InstagramAPI class
+
+# Function for Instagram bot
+def run_instagram_bot():
     instagram_api = InstagramAPI()
-    # Call the method to post and publish a reel
     instagram_api.post_and_publish_reel()
 
+# Function for TikTok bot
+def run_tiktok_bot():
+    tik_tok_upload()
 
-
+# Main bot function
+def bot():
     
+    main()
+
+    # Run each bot/task one after another
+    run_youtube_bot()
+    run_instagram_bot()
+    run_tiktok_bot()
+
 if __name__ == "__main__":
-    
     bot()
