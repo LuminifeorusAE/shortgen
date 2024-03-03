@@ -1,14 +1,18 @@
+#video_downloader.py
+
 import requests
 import random
 import os
 import json
 import re
 from tqdm import tqdm
+from moviepy.editor import VideoFileClip  # Add this import statement
 
 class PexelsVideoDownloader:
     def __init__(self):
         self.api_key = self.read_api_key()
         self.themes = ["beach", "city", "drone footages", "nature", "wild life"]
+        self.total_duration = 0
 
     def read_api_key(self):
         try:
@@ -38,10 +42,6 @@ class PexelsVideoDownloader:
     def sanitize_filename(self, filename):
         return re.sub(r'[\\/*?:"<>|]', '', filename)
 
-    def select_random_videos(self, videos):
-        num_videos = min(len(videos), random.randint(2, 3))
-        return random.sample(videos, num_videos)
-
     def download_video(self, video):
         video_files = video.get('video_files', [])
         if not video_files:
@@ -50,7 +50,6 @@ class PexelsVideoDownloader:
         
         video_file = video_files[0]
         url = video_file['link']
-        
         filename = f"{video['id']}.mp4"
         filename = self.sanitize_filename(filename)
 
@@ -73,27 +72,57 @@ class PexelsVideoDownloader:
                         f.write(data)
                         pbar.update(len(data))
             print(f"Downloaded: {filepath}")
+
+            # Get the duration of the downloaded video
+            clip = VideoFileClip(filepath)
+            duration = clip.duration
+            clip.close()
+
+            # Update total duration
+            self.total_duration += duration
+
         except (requests.RequestException, IOError) as e:
             print(f"Error downloading video: {e}")
+
+    def delete_downloaded_videos(self):
+        folder_path = "footages"  # Adjust the folder path accordingly
+        for filename in os.listdir(folder_path):
+            filepath = os.path.join(folder_path, filename)
+            os.remove(filepath)
+        print("Downloaded videos deleted.")
 
     def main(self):
         if not self.api_key:
             print("Error: Unable to retrieve API key.")
             return
 
-        theme = random.choice(self.themes)
-        print(f"Selected theme: {theme}")
+        while True:
+            theme = random.choice(self.themes)
+            print(f"Selected theme: {theme}")
 
-        videos = self.search_videos(theme)
-        if not videos:
-            print("No videos found.")
-            return
+            videos = self.search_videos(theme)
+            if not videos:
+                print("No videos found.")
+                continue
 
-        selected_videos = self.select_random_videos(videos)
+            selected_videos = []
+            for video in videos:
+                self.download_video(video)
+                selected_videos.append(video)
 
-        for video in selected_videos:
-            self.download_video(video)
+                # Check total duration after each download
+                if 55 <= self.total_duration <= 59:
+                    break
+                elif self.total_duration > 60:
+                    # Remove the last downloaded video if total duration exceeds 60 seconds
+                    last_downloaded_video = selected_videos.pop()
+                    self.delete_video(last_downloaded_video)
+                    # Adjust total duration
+                    self.total_duration -= last_downloaded_video['duration']
 
-if __name__ == "__main__":
-    downloader = PexelsVideoDownloader()
-    downloader.main()
+            # Check if total duration meets criteria
+            if 55 <= self.total_duration <= 59:
+                break
+            else:
+                print("Total duration does not meet criteria. Continuing to download.")
+
