@@ -50,18 +50,16 @@ def generate_title_and_description(video_file):
         theme = "the topic"
 
     # Generate a more descriptive title based on the theme
-    title = f"AI Explains: Generate {theme} Using AI"
+    title = f"Coding Tutorials. {theme}"
 
     # Provide a more descriptive explanation in the description
     description = (
-        f"This video demonstrates the generation of {theme.lower()} using an AI model. "
+        f"This video demonstrates the tutorial of the {theme.lower()}. "
         f"We provide insights and examples to help you understand the process better. "
-        f"If you're interested in learning more about {theme.lower()} generation, this video is for you! "
         "Feel free to contact us at dtadevosyan@gmail.com for any inquiries or further information."
     )
 
     return title, description
-
 
 
 def upload_videos_with_task(youtube_service):

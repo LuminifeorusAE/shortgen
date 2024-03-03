@@ -36,7 +36,6 @@ class PexelsVideoDownloader:
             return []
 
     def sanitize_filename(self, filename):
-        # Remove invalid characters from filename
         return re.sub(r'[\\/*?:"<>|]', '', filename)
 
     def select_random_videos(self, videos):
@@ -48,10 +47,10 @@ class PexelsVideoDownloader:
         if not video_files:
             print("No video files found for the selected video.")
             return
-
+        
         video_file = video_files[0]
         url = video_file['link']
-
+        
         filename = f"{video['id']}.mp4"
         filename = self.sanitize_filename(filename)
 
