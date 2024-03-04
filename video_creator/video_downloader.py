@@ -1,12 +1,11 @@
-#video_downloader.py
-
 import requests
 import random
 import os
 import json
 import re
 from tqdm import tqdm
-from moviepy.editor import VideoFileClip  # Add this import statement
+from moviepy.editor import VideoFileClip
+
 
 class PexelsVideoDownloader:
     def __init__(self):
@@ -84,45 +83,64 @@ class PexelsVideoDownloader:
         except (requests.RequestException, IOError) as e:
             print(f"Error downloading video: {e}")
 
-    def delete_downloaded_videos(self):
-        folder_path = "footages"  # Adjust the folder path accordingly
-        for filename in os.listdir(folder_path):
-            filepath = os.path.join(folder_path, filename)
+    def delete_downloaded_video(self, video):
+        filename = f"{video['id']}.mp4"
+        filepath = os.path.join('footages', filename)
+        if os.path.exists(filepath):
             os.remove(filepath)
-        print("Downloaded videos deleted.")
+            print(f"Deleted: {filepath}")
 
+    
     def main(self):
         if not self.api_key:
             print("Error: Unable to retrieve API key.")
             return
 
-        while True:
-            theme = random.choice(self.themes)
-            print(f"Selected theme: {theme}")
+        # Choose a random theme from the provided themes
+        theme = random.choice(self.themes)
+        print(f"Selected theme: {theme}")
 
-            videos = self.search_videos(theme)
-            if not videos:
-                print("No videos found.")
-                continue
+        # Search for videos based on the chosen theme
+        videos = self.search_videos(theme)
+        if not videos:
+            print("No videos found.")
+            return
 
-            selected_videos = []
-            for video in videos:
-                self.download_video(video)
-                selected_videos.append(video)
+        print(f"Total videos found: {len(videos)}")
 
-                # Check total duration after each download
-                if 55 <= self.total_duration <= 59:
-                    break
-                elif self.total_duration > 60:
-                    # Remove the last downloaded video if total duration exceeds 60 seconds
-                    last_downloaded_video = selected_videos.pop()
-                    self.delete_video(last_downloaded_video)
-                    # Adjust total duration
-                    self.total_duration -= last_downloaded_video['duration']
+        # Sort videos by duration in ascending order
+        videos.sort(key=lambda x: x.get('duration', 0))
 
-            # Check if total duration meets criteria
-            if 55 <= self.total_duration <= 59:
-                break
+        selected_videos = []
+        total_duration = 0  # Initialize total duration for the current selection
+
+        # Select one short, one medium, and one long video
+        short_videos = [video for video in videos if 0 < video.get('duration', 0) <= 15]
+        medium_videos = [video for video in videos if 15 < video.get('duration', 0) <= 30]
+        long_videos = [video for video in videos if video.get('duration', 0) > 30]
+
+        try:
+            # Randomly select one video from each category
+            if short_videos and medium_videos and long_videos:
+                selected_videos.append(random.choice(short_videos))
+                selected_videos.append(random.choice(medium_videos))
+                selected_videos.append(random.choice(long_videos))
+
+                # Calculate total duration
+                total_duration = sum(video.get('duration', 0) for video in selected_videos)
+
+                print(f"Total duration: {total_duration}")
+
+                # Download the selected videos
+                for video in selected_videos:
+                    self.download_video(video)
+
+                # Check if total duration meets criteria after downloading all selected videos
+                if 50 <= total_duration <= 59:
+                    print("Total duration meets criteria.")
+                else:
+                    print("Insufficient videos or total duration does not meet criteria.")
             else:
-                print("Total duration does not meet criteria. Continuing to download.")
-
+                print("Insufficient videos to choose from.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
