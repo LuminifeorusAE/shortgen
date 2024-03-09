@@ -93,7 +93,7 @@ class PexelsVideoDownloader:
     
     def main(self):
         if not self.api_key:
-            print("Error: Unable to retrieve API key.")
+            print("Error: Unable to retrieve API key.") 
             return
 
         # Choose a random theme from the provided themes
@@ -114,33 +114,39 @@ class PexelsVideoDownloader:
         selected_videos = []
         total_duration = 0  # Initialize total duration for the current selection
 
-        # Select one short, one medium, and one long video
-        short_videos = [video for video in videos if 0 < video.get('duration', 0) <= 15]
-        medium_videos = [video for video in videos if 15 < video.get('duration', 0) <= 30]
-        long_videos = [video for video in videos if video.get('duration', 0) > 30]
+        while True:
+            # Select one short, one medium, and one long video
+            short_videos = [video for video in videos if 0 < video.get('duration', 0) <= 15]
+            medium_videos = [video for video in videos if 15 < video.get('duration', 0) <= 30]
+            long_videos = [video for video in videos if video.get('duration', 0) > 30]
 
-        try:
+            print("Short videos:", len(short_videos), "Medium videos:", len(medium_videos), "Long videos:", len(long_videos))
+
+            # Calculate total duration
+            total_duration = sum(video.get('duration', 0) for video in selected_videos)
+            print(f"Total duration after selection: {total_duration}")
+
             # Randomly select one video from each category
             if short_videos and medium_videos and long_videos:
-                selected_videos.append(random.choice(short_videos))
-                selected_videos.append(random.choice(medium_videos))
-                selected_videos.append(random.choice(long_videos))
+                selected_videos = [
+                    random.choice(short_videos),
+                    random.choice(medium_videos),
+                    random.choice(long_videos)
+                ]
 
                 # Calculate total duration
                 total_duration = sum(video.get('duration', 0) for video in selected_videos)
+                print(f"Total duration after selection: {total_duration}")
 
-                print(f"Total duration: {total_duration}")
+                if 50 <= total_duration <= 60:
+                    print(f"Total duration of selected videos meets the criteria: {total_duration} seconds")
 
-                # Download the selected videos
-                for video in selected_videos:
-                    self.download_video(video)
+                    # Download the selected videos
+                    for video in selected_videos:
+                        self.download_video(video)
 
-                # Check if total duration meets criteria after downloading all selected videos
-                if 50 <= total_duration <= 59:
-                    print("Total duration meets criteria.")
+                    print("Videos downloaded successfully.")
+                    break
                 else:
-                    print("Insufficient videos or total duration does not meet criteria.")
-            else:
-                print("Insufficient videos to choose from.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+                    print(f"Insufficient videos or total duration does not meet criteria.")
+                    print(f"Total duration: {total_duration}")  
