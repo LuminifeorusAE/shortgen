@@ -1,3 +1,5 @@
+#video_downloader.py
+
 import requests
 import random
 import os
@@ -87,3 +89,7 @@ class PexelsVideoDownloader:
         self.download_videos(theme, num_videos=10)
 
         print("Videos downloaded successfully.")
+
+downloader = PexelsVideoDownloader()
+downloader.main()
+

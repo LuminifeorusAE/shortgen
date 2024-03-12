@@ -1,3 +1,5 @@
+#video_cutter.py
+
 from moviepy.editor import VideoFileClip
 import os
 import random
@@ -12,7 +14,7 @@ class VideoCutter:
     def cut_videos(self):
         total_duration = 0
         cut_files = []
-        
+
         while total_duration < 55:
             for filename in os.listdir(self.input_dir):
                 if filename.endswith('.mp4'):
@@ -21,29 +23,33 @@ class VideoCutter:
                     
                     # Generate random start and end times for cutting
                     start_time = random.uniform(0, clip.duration - 6)  # Ensure at least 6 seconds left
-                    end_time = start_time + random.uniform(5, 6)
-                    if end_time > clip.duration:
-                        end_time = clip.duration
+                    max_duration = min(6, clip.duration - start_time)  # Adjust duration if remaining clip is too short
+                    end_time = start_time + random.uniform(5, max_duration)
                     
-                    # Cut the video segment
-                    cut_clip = clip.subclip(start_time, end_time)
-                    cut_duration = cut_clip.duration
-                    total_duration += cut_duration
+                    try:
+                        # Cut the video segment
+                        cut_clip = clip.subclip(start_time, end_time)
+                        cut_duration = cut_clip.duration
+                        total_duration += cut_duration
+                        
+                        # Save the cut video segment
+                        output_filename = f"cut_{filename}"
+                        output_path = os.path.join(self.output_dir, output_filename)
+                        cut_clip.write_videofile(output_path, codec="libx264", audio=False)
+                        
+                        # Close the clip to free up resources
+                        cut_clip.close()
+                        
+                        cut_files.append(output_path)
+                        
+                        print(f"Total duration of all cut videos: {total_duration} seconds")
+                        
+                        if total_duration >= 55:
+                            break  # Stop cutting if total duration reaches 55 seconds or more
                     
-                    # Save the cut video segment
-                    output_filename = f"cut_{filename}"
-                    output_path = os.path.join(self.output_dir, output_filename)
-                    cut_clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
-                    
-                    # Close the clip to free up resources
-                    cut_clip.close()
-                    
-                    cut_files.append(output_path)
-                    
-                    print(f"Total duration of all cut videos: {total_duration} seconds")
-                    
-                    if total_duration >= 55:
-                        break  # Stop cutting if total duration reaches 55 seconds or more
+                    except Exception as e:
+                        print(f"Error processing file {file_path}: {e}")
+                        continue  # Continue with the next file if an error occurs
             
             if total_duration < 55:
                 print("Total duration is less than 55 seconds. Cutting another video...")
@@ -61,6 +67,6 @@ class VideoCutter:
         
         print(f"Total duration of all cut videos: {total_duration} seconds")
         return cut_files, total_duration
-    
+
 cutter = VideoCutter()
 downloaded_video_paths, total_duration = cutter.cut_videos()
