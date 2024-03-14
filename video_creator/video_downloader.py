@@ -1,54 +1,74 @@
-#video_downloader.py
-
-import requests
+import os 
 import random
-import os
+import requests
 import json
 from tqdm import tqdm
 
-class PexelsVideoDownloader:
+class VideoDownloader:
+    """
+    A class for downloading videos from Pexels.com.
+    """
     def __init__(self):
-        self.api_key = self.read_api_key()
+        self.api_key = self.load_api_key()
         self.themes = ["beach", "city", "drone footages", "nature"]
+    """
+    Initializes the VideoDownloader class.
+    """
+    def load_api_key(self):
+        """
+        Reads the Pexels API key from a JSON file.
 
-    def read_api_key(self):
+        Returns:
+            str: The Pexels API key.
+        """
         try:
-            with open('pexels_api.json') as f:
-                config = json.load(f)
-                return config['pexels_api_key']
+            with open('pexels_api_2.json') as file:
+                config = json.load(file)
+                return config["pexels_api_key_2"]
         except FileNotFoundError:
-            print("Error: pexels_api.json file not found.")
+            print("Error: Your JSON file should be in the same directory.")
             return None
         except KeyError:
-            print("Error: 'pexels_api_key' not found in pexels_api.json.")
+            print("If it's in the correct directory, please check if it's not empty or corrupted.")
             return None
-
-    def search_videos(self, theme):
+    
+    def search_videos(self, theme, num_videos):
         try:
-            url = f'https://api.pexels.com/videos/search?query={theme}&per_page=50'
-            headers = {'Authorization': self.api_key}
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()  # Raise an exception for HTTP errors
-            data = response.json()
-            return data.get('videos', [])
+            videos = []
+            per_page = 80  # Maximum per_page allowed by the API
+            num_pages = -(-num_videos // per_page)  # Ceiling division to calculate total pages
+            for page in range(1, num_pages + 1):
+                url = f'https://api.pexels.com/videos/search?query={theme}&per_page={per_page}&page={page}'
+                headers = {'Authorization': self.api_key}
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+                videos.extend(data.get('videos', []))
+            
+            print("Total Number of videos Found:", len(videos))
+            print("Videos")
+            for video in videos[:num_videos]:  # Output only the desired number of videos
+                print("Video ID:", video.get('id'))
+                print("Video URL:", video.get('url'))
+                print("Video Duration:", video.get('duration'))
+                print("Video Quality:", video.get('video_files')[0].get('quality'))
+                print("Video Width:", video.get('video_files')[0].get('width'))
+                print("Video Height:", video.get('video_files')[0].get('height'))
+                print("-" * 50)
+
+            print("Number of videos on the page:", len(videos))
+            return videos[:num_videos]
         except requests.RequestException as e:
             print(f"Error searching for videos: {e}")
             return []
-
-    def download_videos(self, theme, num_videos=10):
-        videos = self.search_videos(theme)
-        if not videos:
-            print(f"No videos found for theme '{theme}'.")
+    def download_videos(self, theme, num_videos=10, selected_videos=None):
+        if selected_videos is None:
+            print("Error: No videos selected for download.")
             return
+        
+        print(f"Total videos found for theme '{theme}': {len(selected_videos)}")
 
-        print(f"Total videos found for theme '{theme}': {len(videos)}")
-
-        # Shuffle the list of videos to ensure randomness
-        random.shuffle(videos)
-
-        # Select random videos up to the specified number
-        selected_videos = random.sample(videos, min(num_videos, len(videos)))
-
+        # Create 'footages' folder if it doesn't exist
         if not os.path.exists('footages'):
             os.makedirs('footages')
 
@@ -76,20 +96,11 @@ class PexelsVideoDownloader:
             except (requests.RequestException, IOError) as e:
                 print(f"Error downloading video: {e}")
 
-    def main(self):
-        if not self.api_key:
-            print("Error: Unable to retrieve API key.") 
-            return
-
-        # Choose a random theme from the provided themes
-        theme = random.choice(self.themes)
-        print(f"Selected theme: {theme}")
-
-        # Download 10 random videos for the selected theme
-        self.download_videos(theme, num_videos=10)
-
-        print("Videos downloaded successfully.")
-
-downloader = PexelsVideoDownloader()
-downloader.main()
-
+if __name__ == "__main__":
+    downloader = VideoDownloader()
+    theme = random.choice(downloader.themes)
+    num_videos = 1000
+    videos = downloader.search_videos(theme, num_videos)
+    if videos:
+        selected_videos = random.sample(videos, min(10, len(videos)))
+        downloader.download_videos(theme, num_videos=10, selected_videos=selected_videos)
