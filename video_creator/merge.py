@@ -3,14 +3,17 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips
 
 class VideoMerger:
     def __init__(self, video_dir, output_path):
+        """• Constructor takes two parameters for where to take videos, and where to put edited videos"""
         self.video_dir = video_dir
         self.output_path = output_path
     
-    def adjust_video_properties(self, video_path, output_path, duration=None, aspect_ratio=(9, 16)):
+        
+    def adjust_video_properties(self, video_path, output_path, aspect_ratio=(9, 16)):
+        """• Function is defined to adjust differend video parameters as aspect ratio, codecs and fps to each outher
+           • These lines calculate the dimensions for center cropping the video based on the specified aspect ratio. 
+            It ensures that the cropped video maintains the aspect ratio while maximizing the dimensions.
+        """
         clip = VideoFileClip(video_path)
-        if duration is None:
-            duration = 5.0
-        clip = clip.subclip(0, duration)
         
         # Calculate dimensions for center cropping
         original_width, original_height = clip.size
@@ -39,18 +42,24 @@ class VideoMerger:
         clip_cropped.close()
         clip_resized.close()
 
+
     def merge_videos(self):
+        """
+        • Method collects all the video files in the specified directory, adjusts each video's properties, as the previous function defines
+        • After adjusting all videos, the clips are concatenated together
+        • The resulting final clip is written to the specified path with a frame rate of 30 frames per second.
+        """
         video_files = [f for f in os.listdir(self.video_dir) if f.endswith('.mp4')]
         clips = []
         for video_file in video_files:
             video_path = os.path.join(self.video_dir, video_file)
             adjusted_video_path = os.path.join(self.video_dir, f"{os.path.splitext(video_file)[0]}_adjusted.mp4")
-            self.adjust_video_properties(video_path, adjusted_video_path, duration=5.0, aspect_ratio=(9, 16))
+            self.adjust_video_properties(video_path, adjusted_video_path, aspect_ratio=(9, 16))
     
-            clips.append(VideoFileClip(adjusted_video_path))  # Append the adjusted clip
+            clips.append(VideoFileClip(adjusted_video_path))
         
         final_clip = concatenate_videoclips(clips, method='compose')
-        final_clip.write_videofile(self.output_path, fps=30)  # Set FPS here
+        final_clip.write_videofile(self.output_path, fps=30)
         final_clip.close()
 
 if __name__ == "__main__":

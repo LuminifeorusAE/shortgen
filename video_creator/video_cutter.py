@@ -1,3 +1,5 @@
+#cutvideos
+
 from moviepy.editor import VideoFileClip
 import os
 import random
@@ -19,15 +21,15 @@ class VideoCutter:
 
     def cut_videos(self):
         """
-        Defines a method cut_videos within the class. It initializes total_duration and cut_files lists.
-        Iterates through each file in the input directory. If the file has a '.mp4' extension, it constructs the file's full path and creates a VideoFileClip object.
-        Randomly generates start and end times for cutting the video. It ensures that at least 6 seconds are left after the start time and adjusts the duration if the remaining clip is too short.
-        Cuts the video segment according to the generated start and end times, calculates its duration, and updates the total duration.
-        Defines the output filename, constructs the output path, and saves the cut video segment with specified codec and audio settings.
-        Closes the clip to free up resources, appends the output path to the list of cut files, and prints the total duration of all cut videos.
-        Breaks the loop if the total duration of all cut videos reaches or exceeds 55 seconds.
-        Catches any exceptions that may occur during video processing, prints an error message, and continues with the next file.
-        Checks if the total duration is less than 55 seconds or exceeds 59 seconds. If the latter, it adjusts the last video segment's duration to ensure it doesn't exceed 59 seconds.
+        • Defines a method cut_videos within the class. It initializes total_duration and cut_files lists.
+        • Iterates through each file in the input directory. If the file has a '.mp4' extension, it constructs the file's full path and creates a VideoFileClip object.
+        • Randomly generates start and end times for cutting the video. It ensures that at least 6 seconds are left after the start time and adjusts the duration if the remaining clip is too short.
+        • Cuts the video segment according to the generated start and end times, calculates its duration, and updates the total duration.
+        • Defines the output filename, constructs the output path, and saves the cut video segment with specified codec and audio settings.
+        • Closes the clip to free up resources, appends the output path to the list of cut files, and prints the total duration of all cut videos.
+        • Breaks the loop if the total duration of all cut videos reaches or exceeds 55 seconds.
+        • Catches any exceptions that may occur during video processing, prints an error message, and continues with the next file.
+        • Checks if the total duration is less than 55 seconds or exceeds 59 seconds. If the latter, it adjusts the last video segment's duration to ensure it doesn't exceed 59 seconds.
         """
         
         total_duration = 0
@@ -42,7 +44,7 @@ class VideoCutter:
 
                     start_time = random.uniform(0, clip.duration - 4)
                     max_duration = min(6, clip.duration-start_time)
-                    end_time = start_time+random.uniform(5, max_duration)
+                    end_time = start_time+random.uniform(3, max_duration)
 
                     try:
                         cut_clip = clip.subclip(start_time, end_time)
@@ -65,7 +67,7 @@ class VideoCutter:
             if total_duration < 55:
                 print(f"Total duration is less than 55 seconds. Cutting another video...")
             elif total_duration > 59:
-                print("Total duration is more then 59 seconds.Adding one more video...")
+                print("Total duration is more then 59 seconds.Deleting one video...")
 
                 last_output_path = cut_files[-1]
                 last_clip = VideoFileClip(last_output_path)

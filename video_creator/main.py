@@ -1,10 +1,10 @@
-from video_downloader import PexelsVideoDownloader
+from video_downloader import VideoDownloader
 from video_cutter import VideoCutter
 from merge import VideoMerger
 
 def main(): 
     # Calling video downloader
-    downloader = PexelsVideoDownloader()  # Create an instance of PexelsVideoDownloader
+    downloader = VideoDownloader()  # Create an instance of PexelsVideoDownloader
     downloader.main()
     
     # Cutting the videos to 5-second long videos
