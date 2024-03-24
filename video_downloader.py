@@ -35,9 +35,9 @@ class VideoDownloader():
 
         """
         try:
-            with open('pexels_api_2.json') as file:
+            with open('pexels_api.json') as file:
                 config = json.load(file)
-                return config["pexels_api_key_2"]
+                return config["pexels_api_key"]
         except FileNotFoundError:
             print("Error: Your JSON file should be in the same directory.")
             return None
@@ -172,7 +172,5 @@ if __name__ == "__main__":
     num_videos = 1000
     videos = downloader.search_videos(theme, num_videos)
     if videos:
-        selected_videos =random.sample(videos, min(10, len(videos)))
+        selected_videos = random.sample(videos, min(10, len(videos)))
         downloader.download_videos(theme, num_videos=10, selected_videos=selected_videos)
-    
-
