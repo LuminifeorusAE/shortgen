@@ -125,12 +125,20 @@ class VideoDownloader():
 
     def select_highest_quality_link(self, video):
         """
-        Select the highest-quality link for downloading from the list of video files.
+        Select the highest-quality link for downloading from the list of video files containing 'hd' in the link.
         """
-        # Extract the quality information from each link and select the link with the highest quality
-        video_files = video.get('video_files', [])
-        selected_link = max(video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
+        # Filter video files to those containing 'hd' in the link
+        hd_video_files = [vf for vf in video.get('video_files', []) if 'hd' in vf['link']]
+        
+        # If no 'hd' video files are found, return None
+        if not hd_video_files:
+            return None
+        
+        # Select the link with the highest resolution among 'hd' video files
+        selected_link = max(hd_video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
+    
         return selected_link
+
 
     def get_quality_from_link(self, link):
         """
@@ -158,7 +166,6 @@ class VideoDownloader():
                 return "Unknown"
 
 if __name__ == "__main__":
-
     downloader = VideoDownloader()
     theme = random.choice(downloader.themes)
     num_videos = 1000
@@ -171,11 +178,13 @@ if __name__ == "__main__":
         # Randomly select videos from the filtered list
         selected_videos = random.sample(filtered_videos, min(NUM_VIDEOS_TO_DOWNLOAD, len(filtered_videos)))
         
-        # Print out the randomly selected videos and their resolutions
-        print("Randomly Selected Videos for Downloading:")
+        # Print out all the links from the selected videos for downloading
+        print("Links from Selected Videos for Downloading:")
         for video in selected_videos:
-            resolution = downloader.get_video_resolution(video)
-            print(f"Video ID: {video['id']}, Resolution: {resolution}")
+            print(f"Video ID: {video['id']}")
+            links = [vf['link'] for vf in video.get('video_files', []) if 'hd' in vf['link']]
+            for link in links:
+                print(link)
 
         # Start downloading the selected videos
         print("\nStarting Download...")
