@@ -16,13 +16,27 @@ class VideoDownloader():
     """
 
     def __init__(self):
+        print("Initializing VideoDownloader...")
+        """
+        Initialize the VideoDownloader object.
+
+        Args:
+            api_key (str, optional): The API key for accessing the Pexels API. Defaults to None.
+            per_page (int, optional): Number of videos to fetch per page from Pexels API. Defaults to 80.
+            chunk_size (int, optional): Size of each chunk to download the video file. Defaults to 1024.
+            num_videos_to_download (int, optional): Number of videos to download. Defaults to 10.
+        """
         self.api_key = self.load_api_key()
-        self.themes = ["drone beach", "drone city", "drone nature", "drone beach"]
+        self.themes = ["drone beach", "drone city", "drone nature", "drone forest"]
         self.min_resolution = (1280, 720)  # Set a minimum resolution (e.g., 720p)
     
     def load_api_key(self):
+        print("Loading API key...")
         """
         Load the API key from a JSON file.
+
+        Args:
+            api_key_file (str): Path to the JSON file containing the API key.
         """
         try:
             with open('pexels_api.json') as file:
@@ -33,11 +47,32 @@ class VideoDownloader():
             return None
     
     def search_videos(self, theme, num_videos):
+        print("Searching videos...")
+        """
+        Search for videos based on a given theme with resolution filtering.
+
+        Args:
+            theme (str): The theme to search for.
+            num_videos (int): The number of videos to search for.
+
+        Returns:
+            list: A list of dictionaries, each containing information about a video.
+        """
         try:
             videos = []
             num_pages = -(-num_videos // PER_PAGE)  # Ceiling division to calculate total pages
 
             def fetch_page(page):
+                print(f"Fetching Pages:{num_pages} ")
+                """
+                Fetch videos from a single page of Pexels API.
+
+                Args:
+                page (int): The page number to fetch.
+
+                Returns:
+                list: A list of dictionaries, each containing information about a video.
+                """
                 url = f'https://api.pexels.com/videos/search?query={theme}&per_page={PER_PAGE}&page={page}'
                 headers = {"Authorization": self.api_key}
                 response = self.get_api_response(url, headers)
@@ -57,10 +92,7 @@ class VideoDownloader():
             for video in videos:
                 resolution = self.get_video_resolution(video)
                 if resolution[0] >= self.min_resolution[0] and resolution[1] >= self.min_resolution[1]:
-                    print(f"Downloading video with resolution {resolution}.")
                     filtered_videos.append(video)
-                else:
-                    print(f"Skipping download of video with resolution {resolution} because it is low.")
 
             return filtered_videos[:num_videos]
 
@@ -69,7 +101,24 @@ class VideoDownloader():
             return []
 
 
+    def get_quality_from_link(self, link):
+        print("Getting quality from link...")
+        """
+        Extract the quality information from the link URL.
+
+        Args:
+            link (str): URL of the video file.
+
+        Returns:
+            str: Quality information extracted from the link.
+        """
+        # Split the link using '/' as a delimiter and select the second-to-last part containing the quality information
+        parts = link.split('/')
+        quality_info = parts[-2]
+        return quality_info
+    
     def get_video_resolution(self, video):
+        
         """
         Extract resolution from video metadata.
         """
@@ -82,6 +131,7 @@ class VideoDownloader():
 
 
     def get_api_response(self, url, headers):
+        print("Making API request...")
         """
         Make an HTTP GET request to the specified URL with the provided headers.
         """
@@ -92,7 +142,51 @@ class VideoDownloader():
         except requests.RequestException as e:
             print(f'Error making API request: {e}')
             return None
+        
+    def get_video_metadata(self, filepath):
+        print("Getting video metadata...")
+        """
+        Extract metadata from a video file using ffprobe.
 
+        Args:
+            filepath (str): Path to the video file.
+
+        Returns:
+            str: Resolution of the video in the format "width x height".
+        """
+        try:
+            probe = FFProbe(filepath)
+            video_info = next(s for s in probe.streams if s.is_video())
+            resolution = f"{video_info.width}x{video_info.height}"
+            return resolution
+        except Exception as e:
+            print(f"Error extracting metadata from video: {e}")
+            return "Unknown"
+
+    
+    def select_highest_quality_link(self, video):
+        print("Selecting highest quality link...")
+        """
+        Select the highest-quality link for downloading from the list of video files,
+        ensuring it meets the minimum resolution requirement.
+
+        Args:
+            video (dict): Dictionary containing information about the video.
+
+        Returns:
+            str: URL of the selected highest-quality video file.
+        """
+        # Filter video files to those containing 'hd' in the link
+        hd_video_files = [vf for vf in video.get('video_files', []) if 'hd' in vf['link']]
+        
+        # If no 'hd' video files are found, return None
+        if not hd_video_files:
+            return None
+        
+        # Select the link with the highest resolution among 'hd' video files
+        selected_link = max(hd_video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
+    
+        return selected_link
     
     def download_video(self, video, output_folder):
         """
@@ -103,9 +197,15 @@ class VideoDownloader():
         filepath = os.path.join(output_folder, filename)
 
         try:
+            # Print all available links for the video
+            links = [vf['link'] for vf in video.get('video_files', [])]
+            print(f"Available Links for Video ID {video_id}:")
+            for link in links:
+                print(link)
+
             # Select the highest-quality link for downloading
             selected_link = self.select_highest_quality_link(video)
-            
+
             # Print video ID, resolution, and selected link
             print(f"Video ID: {video_id}, Resolution: {self.get_video_resolution(video)}, Selected Link: {selected_link}")
 
@@ -123,49 +223,12 @@ class VideoDownloader():
         except IOError as e:
             print(f"Error writing video: {e}")
 
-    def select_highest_quality_link(self, video):
-        """
-        Select the highest-quality link for downloading from the list of video files containing 'hd' in the link.
-        """
-        # Filter video files to those containing 'hd' in the link
-        hd_video_files = [vf for vf in video.get('video_files', []) if 'hd' in vf['link']]
-        
-        # If no 'hd' video files are found, return None
-        if not hd_video_files:
-            return None
-        
-        # Select the link with the highest resolution among 'hd' video files
-        selected_link = max(hd_video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
-    
-        return selected_link
-
-
-    def get_quality_from_link(self, link):
-        """
-        Extract the quality information from the link URL.
-        """
-        # Split the link using '/' as a delimiter and select the second-to-last part containing the quality information
-        parts = link.split('/')
-        quality_info = parts[-2]
-        return quality_info
 
 
 
-
-    def get_video_metadata(self, filepath):
-            """
-            Extract metadata from a video file using ffprobe.
-            """
-            try:
-                probe = FFProbe(filepath)
-                video_info = next(s for s in probe.streams if s.is_video())
-                resolution = f"{video_info.width}x{video_info.height}"
-                return resolution
-            except Exception as e:
-                print(f"Error extracting metadata from video: {e}")
-                return "Unknown"
 
 if __name__ == "__main__":
+    print("Initializing VideoDownloader instance...")
     downloader = VideoDownloader()
     theme = random.choice(downloader.themes)
     num_videos = 1000
@@ -192,3 +255,5 @@ if __name__ == "__main__":
             downloader.download_video(video, 'footages')
     else:
         print("No videos found with resolutions higher than the minimum set resolution.")
+
+
