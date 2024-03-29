@@ -29,7 +29,67 @@ class VideoDownloader():
         self.api_key = self.load_api_key()
         self.themes = ["drone beach", "drone city", "drone nature", "drone forest"]
         self.min_resolution = (1280, 720)  # Set a minimum resolution (e.g., 720p)
+
+    def get_api_response(self, url, headers):
+        print("Making API request...")
+        """
+        Make an HTTP GET request to the specified URL with the provided headers.
+        """
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            return response
+        except requests.RequestException as e:
+            print(f'Error making API request: {e}')
+            return None
+        
+    def get_quality_from_link(self, link):
+        print("Getting quality from link...")
+        """
+        Extract the quality information from the link URL.
+
+        Args:
+            link (str): URL of the video file.
+
+        Returns:
+            str: Quality information extracted from the link.
+        """
+        # Split the link using '/' as a delimiter and select the second-to-last part containing the quality information
+        parts = link.split('/')
+        quality_info = parts[-2]
+        return quality_info
     
+    def get_video_resolution(self, video):
+        
+        """
+        Extract resolution from video metadata.
+        """
+        if 'width' in video and 'height' in video:
+            return (video['width'], video['height'])
+        else:
+            print("Video metadata:", video)  # Print video metadata for debugging
+            return (0, 0)  # Unknown resolution
+    def get_video_metadata(self, filepath):
+        print("Getting video metadata...")
+        """
+        Extract metadata from a video file using ffprobe.
+
+        Args:
+            filepath (str): Path to the video file.
+
+        Returns:
+            str: Resolution of the video in the format "width x height".
+        """
+        try:
+            probe = FFProbe(filepath)
+            video_info = next(s for s in probe.streams if s.is_video())
+            resolution = f"{video_info.width}x{video_info.height}"
+            return resolution
+        except Exception as e:
+            print(f"Error extracting metadata from video: {e}")
+            return "Unknown"
+        
+        
     def load_api_key(self):
         print("Loading API key...")
         """
@@ -101,69 +161,6 @@ class VideoDownloader():
             return []
 
 
-    def get_quality_from_link(self, link):
-        print("Getting quality from link...")
-        """
-        Extract the quality information from the link URL.
-
-        Args:
-            link (str): URL of the video file.
-
-        Returns:
-            str: Quality information extracted from the link.
-        """
-        # Split the link using '/' as a delimiter and select the second-to-last part containing the quality information
-        parts = link.split('/')
-        quality_info = parts[-2]
-        return quality_info
-    
-    def get_video_resolution(self, video):
-        
-        """
-        Extract resolution from video metadata.
-        """
-        if 'width' in video and 'height' in video:
-            return (video['width'], video['height'])
-        else:
-            print("Video metadata:", video)  # Print video metadata for debugging
-            return (0, 0)  # Unknown resolution
-
-
-
-    def get_api_response(self, url, headers):
-        print("Making API request...")
-        """
-        Make an HTTP GET request to the specified URL with the provided headers.
-        """
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            return response
-        except requests.RequestException as e:
-            print(f'Error making API request: {e}')
-            return None
-        
-    def get_video_metadata(self, filepath):
-        print("Getting video metadata...")
-        """
-        Extract metadata from a video file using ffprobe.
-
-        Args:
-            filepath (str): Path to the video file.
-
-        Returns:
-            str: Resolution of the video in the format "width x height".
-        """
-        try:
-            probe = FFProbe(filepath)
-            video_info = next(s for s in probe.streams if s.is_video())
-            resolution = f"{video_info.width}x{video_info.height}"
-            return resolution
-        except Exception as e:
-            print(f"Error extracting metadata from video: {e}")
-            return "Unknown"
-
-    
     def select_highest_quality_link(self, video):
         print("Selecting highest quality link...")
         """
@@ -255,5 +252,3 @@ if __name__ == "__main__":
             downloader.download_video(video, 'footages')
     else:
         print("No videos found with resolutions higher than the minimum set resolution.")
-
-
