@@ -27,7 +27,7 @@ class VideoDownloader():
             num_videos_to_download (int, optional): Number of videos to download. Defaults to 10.
         """
         self.api_key = self.load_api_key()
-        self.themes = ["drone beach", "drone city", "drone nature", "drone forest"]
+        self.themes = ["drone beach", "drone city", "drone nature", "drone forest", "drone waterfall"]
         self.min_resolution = (1280, 720)  # Set a minimum resolution (e.g., 720p)
 
     def get_api_response(self, url, headers):
@@ -44,7 +44,6 @@ class VideoDownloader():
             return None
         
     def get_quality_from_link(self, link):
-        print("Getting quality from link...")
         """
         Extract the quality information from the link URL.
 
@@ -69,6 +68,7 @@ class VideoDownloader():
         else:
             print("Video metadata:", video)  # Print video metadata for debugging
             return (0, 0)  # Unknown resolution
+        
     def get_video_metadata(self, filepath):
         print("Getting video metadata...")
         """
@@ -204,7 +204,7 @@ class VideoDownloader():
             selected_link = self.select_highest_quality_link(video)
 
             # Print video ID, resolution, and selected link
-            print(f"Video ID: {video_id}, Resolution: {self.get_video_resolution(video)}, Selected Link: {selected_link}")
+            print(f"Selected Link: {selected_link}")
 
             # Download the video using the selected link
             with requests.get(selected_link, stream=True) as response, open(filepath, 'wb') as f:
@@ -239,7 +239,7 @@ if __name__ == "__main__":
         selected_videos = random.sample(filtered_videos, min(NUM_VIDEOS_TO_DOWNLOAD, len(filtered_videos)))
         
         # Print out all the links from the selected videos for downloading
-        print("Links from Selected Videos for Downloading:")
+        print("Links Containing HD Videos for Downloading:")
         for video in selected_videos:
             print(f"Video ID: {video['id']}")
             links = [vf['link'] for vf in video.get('video_files', []) if 'hd' in vf['link']]

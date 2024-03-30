@@ -52,50 +52,57 @@ class VideoCutter:
         total_duration = 0
         cut_files = []
 
-        while total_duration < min_duration:
-            for filename in os.listdir(self.input_dir):
-                if filename.endswith('.mp4'):
-                    file_path = os.path.join(self.input_dir, filename)
-                    clip = VideoFileClip(file_path)
+        try:
+            while total_duration < min_duration:
+                for filename in os.listdir(self.input_dir):
+                    if filename.endswith('.mp4'):
+                        file_path = os.path.join(self.input_dir, filename)
+                        clip = VideoFileClip(file_path)
 
-                    start_time = random.uniform(0, clip.duration - 4)
-                    max_clip_duration = min(max_duration - total_duration, clip.duration - start_time)
-                    end_time = start_time + random.uniform(3, max_clip_duration)
+                        start_time = random.uniform(0, clip.duration - 4)
+                        max_clip_duration = min(max_duration - total_duration, clip.duration - start_time)
+                        end_time = start_time + random.uniform(3, max_clip_duration)
 
-                    try:
-                        cut_clip = clip.subclip(start_time, end_time)
-                        cut_duration = cut_clip.duration
-                        total_duration += cut_duration
+                        try:
+                            cut_clip = clip.subclip(start_time, end_time)
+                            cut_duration = cut_clip.duration
+                            total_duration += cut_duration
 
-                        output_filename = f"cut_{filename}"
-                        output_path = os.path.join(self.output_dir, output_filename)
-                        cut_clip.write_videofile(output_path, codec="libx264", audio=False)
+                            output_filename = f"cut_{filename}"
+                            output_path = os.path.join(self.output_dir, output_filename)
+                            cut_clip.write_videofile(output_path, codec="libx264", audio=False)
 
-                        cut_clip.close()
-                        cut_files.append(output_path)
-                        print(f'Total duration of all cut videos: {total_duration} seconds')
+                            cut_clip.close()
+                            cut_files.append(output_path)
+                            print(f'Total duration of all cut videos: {total_duration} seconds')
 
-                        if total_duration >= min_duration:
-                            break
-                    except Exception as e:
-                        print(f"Error processing file {file_path}: {e}")
-                        continue
+                            if total_duration >= min_duration:
+                                return cut_files, total_duration
+                        except Exception as e:
+                            print(f"Error processing file {file_path}: {e}")
+                            continue
 
-            if total_duration < min_duration:
-                print("Total duration is less than the minimum required. Cutting another video...")
-            elif total_duration > max_duration:
-                print("Total duration exceeds the maximum allowed. Deleting one video...")
+                if total_duration < min_duration:
+                    print("Total duration is less than the minimum required. Cutting another video...")
+                elif total_duration > max_duration:
+                    print("Total duration exceeds the maximum allowed. Deleting one video...")
 
-                last_output_path = cut_files[-1]
-                last_clip = VideoFileClip(last_output_path)
-                extra_duration = total_duration - max_duration
-                last_duration = last_clip.duration - extra_duration
-                last_clip = last_clip.subclip(0, last_duration)
-                last_clip.write_videofile(last_output_path, codec="libx264", audio_codec='aac')
-                last_clip.close()
-                total_duration = max_duration
-                print(f"Total duration of all cut videos: {total_duration} seconds")
-                return cut_files, total_duration
+                    last_output_path = cut_files[-1]
+                    last_clip = VideoFileClip(last_output_path)
+                    extra_duration = total_duration - max_duration
+                    last_duration = last_clip.duration - extra_duration
+                    last_clip = last_clip.subclip(0, last_duration)
+                    last_clip.write_videofile(last_output_path, codec="libx264", audio_codec='aac')
+                    last_clip.close()
+                    total_duration = max_duration
+                    print(f"Total duration of all cut videos: {total_duration} seconds")
+                    return cut_files, total_duration
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+        return cut_files, total_duration  # Ensure the method returns the values even if the loop terminates early
+
+
 
 if __name__ == "__main__":            
     cutter = VideoCutter()
