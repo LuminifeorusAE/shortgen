@@ -76,3 +76,18 @@ if __name__ == "__main__":
     video_editor = VideoEditor(video_path, music_folder, output_dir)
     
     video_editor.add_music_from_index()
+# Detect and delete MP4 files in the "final_videos" directory
+
+    mp4_in_final_videos = any(filename.endswith(".mp4") for filename in os.listdir(output_dir))
+
+    if mp4_in_final_videos:
+        print("MP4 file found in 'final_videos' directory. Deleting videos...")
+        for directory in ["cut_videos", "merged_video", "footages"]:
+            for filename in os.listdir(directory):
+                file_path = os.path.join(directory, filename)
+                if filename.endswith(".mp4"):
+                    os.remove(file_path)
+                    print(f"Deleted: {file_path}")
+        print("Videos deleted successfully.")
+    else:
+        print("No MP4 file found in 'final_videos' directory.")
