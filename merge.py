@@ -49,17 +49,21 @@ class VideoMerger:
         • After adjusting all videos, the clips are concatenated together
         • The resulting final clip is written to the specified path with a frame rate of 30 frames per second.
         """
+        output_directory = "merged_video"
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+        
         video_files = [f for f in os.listdir(self.video_dir) if f.endswith('.mp4')]
         clips = []
         for video_file in video_files:
             video_path = os.path.join(self.video_dir, video_file)
-            adjusted_video_path = os.path.join(self.video_dir, f"{os.path.splitext(video_file)[0]}_adjusted.mp4")
+            adjusted_video_path = os.path.join(output_directory, f"{os.path.splitext(video_file)[0]}_adjusted.mp4")
             self.adjust_video_properties(video_path, adjusted_video_path, aspect_ratio=(9, 16))
     
             clips.append(VideoFileClip(adjusted_video_path))
         
         final_clip = concatenate_videoclips(clips, method='compose')
-        final_clip.write_videofile(self.output_path, fps=30)
+        final_clip.write_videofile(os.path.join(output_directory, self.output_path), fps=30)
         final_clip.close()
 
 if __name__ == "__main__":

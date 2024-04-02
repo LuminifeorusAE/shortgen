@@ -2,17 +2,20 @@ from moviepy.editor import VideoFileClip
 import os
 import random
 
+# Module for cutting video clips from a directory of video files.
 """
 #cutvideos
-
-Module for cutting video clips from a directory of video files.
 """
 
 class VideoCutter:
-    """Class for cutting video clips from a directory of video files."""
+    # Class for cutting video clips from a directory of video files.
+    """
+    Class for cutting video clips from a directory of video files.
+    """
 
     def __init__(self, input_dir='footages', output_dir='cut_videos'):
-        """Initialize the VideoCutter instance.
+        """
+        Initialize the VideoCutter instance.
 
         Args:
             input_dir (str): Path to the directory containing input video files.
@@ -24,7 +27,8 @@ class VideoCutter:
             os.makedirs(self.output_dir)
 
     def check_video_count(self, min_count=10):
-        """Check if there are enough video files in the input directory.
+        """
+        Check if there are enough video files in the input directory.
 
         Args:
             min_count (int): Minimum number of video files required.
@@ -36,7 +40,8 @@ class VideoCutter:
         return video_count >= min_count
 
     def cut_videos(self, min_duration=55, max_duration=59):
-        """Cut video clips from input video files and save them to the output directory.
+        """
+        Cut video clips from input video files and save them to the output directory.
 
         Args:
             min_duration (int): Minimum duration of the combined video clips.
@@ -64,10 +69,10 @@ class VideoCutter:
                         end_time = start_time + random.uniform(3, max_clip_duration)
 
                         try:
-                            cut_clip = clip.subclip(start_time, end_time)
+                            cut_clip = clip.subclip(start_time, end_time) 
                             cut_duration = cut_clip.duration
                             total_duration += cut_duration
-
+                
                             output_filename = f"cut_{filename}"
                             output_path = os.path.join(self.output_dir, output_filename)
                             cut_clip.write_videofile(output_path, codec="libx264", audio=False)
@@ -104,6 +109,8 @@ class VideoCutter:
 
 
 
-if __name__ == "__main__":            
+if __name__ == "__main__":
+    # Instantiate the VideoCutter class
     cutter = VideoCutter()
+    # Call the cut_videos method to begin cutting videos
     downloaded_video_paths, total_duration = cutter.cut_videos()

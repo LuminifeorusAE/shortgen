@@ -230,8 +230,15 @@ if __name__ == "__main__":
     theme = random.choice(downloader.themes)
     num_videos = 1000
     
+    # Ensure the 'footages' directory exists or create it if it doesn't
+    output_folder = 'footages'
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+        print(f"Directory '{output_folder}' created.")
+
     # Search for videos based on the theme with resolution filtering
     filtered_videos = downloader.search_videos(theme, num_videos)
+    print(f"Downloading{num_videos} from {theme}")
     
     # Check if there are any filtered videos
     if filtered_videos:
