@@ -27,11 +27,11 @@ class VideoDownloader():
             num_videos_to_download (int, optional): Number of videos to download. Defaults to 10.
         """
         self.api_key = self.load_api_key()
-        self.themes = ["drone beach", "drone city", "drone nature", "drone forest", "drone waterfall"]
-        self.min_resolution = (1280, 720)  # Set a minimum resolution (e.g., 720p)
+        self.themes = ["drone beach", "sunsets", "drone adriatic", "drone nature", "drone forest", "drone waterfall"]
+        self.min_resolution = (1080, 1920)  # Set a minimum resolution (e.g., 720p)
 
     def get_api_response(self, url, headers):
-        print("Making API request...")
+
         """
         Make an HTTP GET request to the specified URL with the provided headers.
         """
@@ -123,7 +123,6 @@ class VideoDownloader():
             num_pages = -(-num_videos // PER_PAGE)  # Ceiling division to calculate total pages
 
             def fetch_page(page):
-                print(f"Fetching Pages:{num_pages} ")
                 """
                 Fetch videos from a single page of Pexels API.
 
@@ -171,10 +170,10 @@ class VideoDownloader():
             video (dict): Dictionary containing information about the video.
 
         Returns:
-            str: URL of the selected highest-quality video file.
+            str: URL of the selected highest-quality video file, or None if not found.
         """
         # Filter video files to those containing 'hd' in the link
-        hd_video_files = [vf for vf in video.get('video_files', []) if 'hd' in vf['link']]
+        hd_video_files = [vf for vf in video.get('video_files', []) if 'hd_1920_1080' in vf['link']]
         
         # If no 'hd' video files are found, return None
         if not hd_video_files:
@@ -182,9 +181,9 @@ class VideoDownloader():
         
         # Select the link with the highest resolution among 'hd' video files
         selected_link = max(hd_video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
-    
+        
         return selected_link
-    
+
     def download_video(self, video, output_folder):
         """
         Download a video and print its resolution and selected link for downloading.
@@ -203,6 +202,10 @@ class VideoDownloader():
             # Select the highest-quality link for downloading
             selected_link = self.select_highest_quality_link(video)
 
+            if selected_link is None:
+                print("No suitable link found. Fetching another video...")
+                return False  # Signal to fetch another video
+            
             # Print video ID, resolution, and selected link
             print(f"Selected Link: {selected_link}")
 
@@ -215,14 +218,12 @@ class VideoDownloader():
                         f.write(data)
                         pbar.update(len(data))
             print(f"Downloaded: {filepath}")
+            return True
         except requests.exceptions.RequestException as e:
             print(f"Error downloading video: {e}")
         except IOError as e:
             print(f"Error writing video: {e}")
-
-
-
-
+        return False
 
 if __name__ == "__main__":
     print("Initializing VideoDownloader instance...")
@@ -238,7 +239,7 @@ if __name__ == "__main__":
 
     # Search for videos based on the theme with resolution filtering
     filtered_videos = downloader.search_videos(theme, num_videos)
-    print(f"Downloading{num_videos} from {theme}")
+    print(f"Downloading {NUM_VIDEOS_TO_DOWNLOAD} from {theme}")
     
     # Check if there are any filtered videos
     if filtered_videos:
@@ -249,13 +250,47 @@ if __name__ == "__main__":
         print("Links Containing HD Videos for Downloading:")
         for video in selected_videos:
             print(f"Video ID: {video['id']}")
-            links = [vf['link'] for vf in video.get('video_files', []) if 'hd' in vf['link']]
+            links = [vf['link'] for vf in video.get('video_files', []) if 'hd_1920_1080' in vf['link']]
             for link in links:
                 print(link)
 
         # Start downloading the selected videos
         print("\nStarting Download...")
-        for video in selected_videos:
-            downloader.download_video(video, 'footages')
+        downloaded_count = 0
+        attempted_videos = set()  # To store IDs of attempted videos
+        
+        # If less than NUM_VIDEOS_TO_DOWNLOAD videos were downloaded, fetch more videos
+        remaining_videos_needed = NUM_VIDEOS_TO_DOWNLOAD - downloaded_count
+        while remaining_videos_needed > 0:
+            print("Fetching additional videos to ensure enough links for download...")
+            additional_videos = downloader.search_videos(theme, num_videos)
+            if additional_videos:
+                for video in additional_videos:
+                    # Check if the video has already been attempted
+                    if video['id'] in attempted_videos:
+                        continue  # Skip this video if already attempted
+                    for link in video.get('video_files', []):
+                        if 'hd_1920_1080' in link['link']:
+                            success = downloader.download_video(video, 'footages')
+                            attempted_videos.add(video['id'])
+                            if success:
+                                downloaded_count += 1
+                                remaining_videos_needed -= 1
+                                print(f"Downloaded video count: {downloaded_count}/{NUM_VIDEOS_TO_DOWNLOAD}")
+                                break
+                    if remaining_videos_needed <= 0:
+                        break  # Exit the loop if enough videos have been downloaded
+                print(f"Total downloaded videos: {downloaded_count}")
+                if remaining_videos_needed <= 0:
+                    break  # Exit the loop if enough videos have been downloaded
+            else:
+                print("No more videos available.")
+                break
+
+        print(f"Total downloaded videos: {downloaded_count}")
     else:
         print("No videos found with resolutions higher than the minimum set resolution.")
+
+
+
+

@@ -1,3 +1,5 @@
+#main.py
+
 from video_downloader import VideoDownloader
 from video_cutter import VideoCutter
 from merge import VideoMerger
@@ -7,8 +9,8 @@ import os
 
 NUM_VIDEOS_TO_DOWNLOAD = 10  # Set the desired number of videos to download
 
+
 if __name__ == "__main__":
-    # Create an instance of VideoDownloader
     print("Initializing VideoDownloader instance...")
     downloader = VideoDownloader()
     theme = random.choice(downloader.themes)
@@ -22,6 +24,7 @@ if __name__ == "__main__":
 
     # Search for videos based on the theme with resolution filtering
     filtered_videos = downloader.search_videos(theme, num_videos)
+    print(f"Downloading {NUM_VIDEOS_TO_DOWNLOAD} from {theme}")
     
     # Check if there are any filtered videos
     if filtered_videos:
@@ -29,18 +32,47 @@ if __name__ == "__main__":
         selected_videos = random.sample(filtered_videos, min(NUM_VIDEOS_TO_DOWNLOAD, len(filtered_videos)))
         
         # Print out all the links from the selected videos for downloading
-        print("Links Containing HD Videos for Downloading: \n")
-        print(f"Downloading {NUM_VIDEOS_TO_DOWNLOAD} videos from {theme} theme")
+        print("Links Containing HD Videos for Downloading:")
         for video in selected_videos:
             print(f"Video ID: {video['id']}")
-            links = [vf['link'] for vf in video.get('video_files', []) if 'hd' in vf['link']]
+            links = [vf['link'] for vf in video.get('video_files', []) if 'hd_1920_1080' in vf['link']]
             for link in links:
                 print(link)
 
         # Start downloading the selected videos
         print("\nStarting Download...")
-        for video in selected_videos:
-            downloader.download_video(video, 'footages')
+        downloaded_count = 0
+        attempted_videos = set()  # To store IDs of attempted videos
+        
+        # If less than NUM_VIDEOS_TO_DOWNLOAD videos were downloaded, fetch more videos
+        remaining_videos_needed = NUM_VIDEOS_TO_DOWNLOAD - downloaded_count
+        while remaining_videos_needed > 0:
+            print("Fetching additional videos to ensure enough links for download...")
+            additional_videos = downloader.search_videos(theme, num_videos)
+            if additional_videos:
+                for video in additional_videos:
+                    # Check if the video has already been attempted
+                    if video['id'] in attempted_videos:
+                        continue  # Skip this video if already attempted
+                    for link in video.get('video_files', []):
+                        if 'hd_1920_1080' in link['link']:
+                            success = downloader.download_video(video, 'footages')
+                            attempted_videos.add(video['id'])
+                            if success:
+                                downloaded_count += 1
+                                remaining_videos_needed -= 1
+                                print(f"Downloaded video count: {downloaded_count}/{NUM_VIDEOS_TO_DOWNLOAD}")
+                                break
+                    if remaining_videos_needed <= 0:
+                        break  # Exit the loop if enough videos have been downloaded
+                print(f"Total downloaded videos: {downloaded_count}")
+                if remaining_videos_needed <= 0:
+                    break  # Exit the loop if enough videos have been downloaded
+            else:
+                print("No more videos available.")
+                break
+
+        print(f"Total downloaded videos: {downloaded_count}")
     else:
         print("No videos found with resolutions higher than the minimum set resolution.")
 
@@ -49,9 +81,6 @@ if __name__ == "__main__":
 
     video_dir = "cut_videos" 
     output_path = "merged_video.mp4"  
-
-    video_dir = "cut_videos"  # Directory containing the input video files
-    output_path = "merged_video.mp4"  # Path to the output merged video file
 
     merger = VideoMerger(video_dir, output_path)
     merger.merge_videos()
@@ -76,8 +105,9 @@ if __name__ == "__main__":
     video_editor = VideoEditor(video_path, music_folder, output_dir)
     
     video_editor.add_music_from_index()
-# Detect and delete MP4 files in the "final_videos" directory
+    # Detect and delete MP4 files in the "final_videos" directory
 
+    # Cleanup
     mp4_in_final_videos = any(filename.endswith(".mp4") for filename in os.listdir(output_dir))
 
     if mp4_in_final_videos:
@@ -86,8 +116,17 @@ if __name__ == "__main__":
             for filename in os.listdir(directory):
                 file_path = os.path.join(directory, filename)
                 if filename.endswith(".mp4"):
-                    os.remove(file_path)
-                    print(f"Deleted: {file_path}")
+                    try:
+                        os.remove(file_path)
+                        print(f"Deleted: {file_path}")
+                    except Exception as e:
+                        print(f"Error deleting {file_path}: {e}")
+                        print("Retrying deletion...")
+                        try:
+                            os.remove(file_path)
+                            print(f"Deleted after retry: {file_path}")
+                        except Exception as e:
+                            print(f"Failed to delete {file_path} after retry: {e}")
         print("Videos deleted successfully.")
     else:
         print("No MP4 file found in 'final_videos' directory.")

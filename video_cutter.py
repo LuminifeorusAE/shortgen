@@ -113,4 +113,4 @@ if __name__ == "__main__":
     # Instantiate the VideoCutter class
     cutter = VideoCutter()
     # Call the cut_videos method to begin cutting videos
-    downloaded_video_paths, total_duration = cutter.cut_videos()
+    downloaded_video_paths, total_duration, = cutter.cut_videos()

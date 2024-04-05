@@ -32,7 +32,7 @@ class VideoMerger:
         clip_cropped = clip.crop(x_center=x_offset, y_center=y_offset, width=target_width, height=target_height)
         
         # Resize to the specified resolution
-        clip_resized = clip_cropped.resize((720, 1280))
+        clip_resized = clip_cropped.resize((1080, 1920))
         
         # Write the adjusted video to the output path
         clip_resized.write_videofile(output_path, fps=30)  # Set FPS here
