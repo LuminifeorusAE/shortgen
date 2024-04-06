@@ -19,19 +19,12 @@ class VideoDownloader():
         print("Initializing VideoDownloader...")
         """
         Initialize the VideoDownloader object.
-
-        Args:
-            api_key (str, optional): The API key for accessing the Pexels API. Defaults to None.
-            per_page (int, optional): Number of videos to fetch per page from Pexels API. Defaults to 80.
-            chunk_size (int, optional): Size of each chunk to download the video file. Defaults to 1024.
-            num_videos_to_download (int, optional): Number of videos to download. Defaults to 10.
         """
         self.api_key = self.load_api_key()
         self.themes = ["drone beach", "sunsets", "drone adriatic", "drone nature", "drone forest", "drone waterfall"]
         self.min_resolution = (1080, 1920)  # Set a minimum resolution (e.g., 720p)
 
     def get_api_response(self, url, headers):
-
         """
         Make an HTTP GET request to the specified URL with the provided headers.
         """
@@ -53,22 +46,39 @@ class VideoDownloader():
         Returns:
             str: Quality information extracted from the link.
         """
-        # Split the link using '/' as a delimiter and select the second-to-last part containing the quality information
         parts = link.split('/')
         quality_info = parts[-2]
         return quality_info
     
-    def get_video_resolution(self, video):
+    def get_video_info(self, video, mode='resolution'):
+        """
+        Get video resolution or select the highest quality link based on the mode.
+
+        Args:
+            video (dict): Dictionary containing information about the video.
+            mode (str): Mode to determine the action. Can be 'resolution' or 'link'.
         
+        Returns:
+            str: Resolution of the video in the format "width x height" if mode is 'resolution'.
+            str: URL of the selected highest-quality video file if mode is 'link'.
+            None: If mode is invalid or no suitable link found.
         """
-        Extract resolution from video metadata.
-        """
-        if 'width' in video and 'height' in video:
-            return (video['width'], video['height'])
+        if mode == 'resolution':
+            if 'width' in video and 'height' in video:
+                return f"{video['width']}x{video['height']}"
+            else:
+                print("Video metadata:", video)  # Print video metadata for debugging
+                return "Unknown"  # Unknown resolution
+        elif mode == 'link':
+            hd_video_files = [vf for vf in video.get('video_files', []) if 'hd_1920_1080' in vf['link']]
+            if not hd_video_files:
+                return None
+            selected_link = max(hd_video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
+            return selected_link
         else:
-            print("Video metadata:", video)  # Print video metadata for debugging
-            return (0, 0)  # Unknown resolution
-        
+            print("Invalid mode specified.")
+            return None
+
     def get_video_metadata(self, filepath):
         print("Getting video metadata...")
         """
@@ -94,9 +104,6 @@ class VideoDownloader():
         print("Loading API key...")
         """
         Load the API key from a JSON file.
-
-        Args:
-            api_key_file (str): Path to the JSON file containing the API key.
         """
         try:
             with open('pexels_api.json') as file:
@@ -127,10 +134,10 @@ class VideoDownloader():
                 Fetch videos from a single page of Pexels API.
 
                 Args:
-                page (int): The page number to fetch.
+                    page (int): The page number to fetch.
 
                 Returns:
-                list: A list of dictionaries, each containing information about a video.
+                    list: A list of dictionaries, each containing information about a video.
                 """
                 url = f'https://api.pexels.com/videos/search?query={theme}&per_page={PER_PAGE}&page={page}'
                 headers = {"Authorization": self.api_key}
@@ -149,8 +156,8 @@ class VideoDownloader():
             print("Filtered Videos:")
             filtered_videos = []
             for video in videos:
-                resolution = self.get_video_resolution(video)
-                if resolution[0] >= self.min_resolution[0] and resolution[1] >= self.min_resolution[1]:
+                resolution = self.get_video_info(video, mode='resolution')
+                if resolution != "Unknown":
                     filtered_videos.append(video)
 
             return filtered_videos[:num_videos]
@@ -158,31 +165,6 @@ class VideoDownloader():
         except requests.RequestException as e:
             print(f'Error searching for videos: {e}')
             return []
-
-
-    def select_highest_quality_link(self, video):
-        print("Selecting highest quality link...")
-        """
-        Select the highest-quality link for downloading from the list of video files,
-        ensuring it meets the minimum resolution requirement.
-
-        Args:
-            video (dict): Dictionary containing information about the video.
-
-        Returns:
-            str: URL of the selected highest-quality video file, or None if not found.
-        """
-        # Filter video files to those containing 'hd' in the link
-        hd_video_files = [vf for vf in video.get('video_files', []) if 'hd_1920_1080' in vf['link']]
-        
-        # If no 'hd' video files are found, return None
-        if not hd_video_files:
-            return None
-        
-        # Select the link with the highest resolution among 'hd' video files
-        selected_link = max(hd_video_files, key=lambda x: self.get_quality_from_link(x['link']))['link']
-        
-        return selected_link
 
     def download_video(self, video, output_folder):
         """
@@ -200,7 +182,7 @@ class VideoDownloader():
                 print(link)
 
             # Select the highest-quality link for downloading
-            selected_link = self.select_highest_quality_link(video)
+            selected_link = self.get_video_info(video, mode='link')
 
             if selected_link is None:
                 print("No suitable link found. Fetching another video...")
@@ -224,6 +206,7 @@ class VideoDownloader():
         except IOError as e:
             print(f"Error writing video: {e}")
         return False
+
 
 if __name__ == "__main__":
     print("Initializing VideoDownloader instance...")
