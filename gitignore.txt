@@ -2,6 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
+#files
+#footages
+#cut_videos
+# merged_video
+# final_video
 
 # C extensions
 *.so
