@@ -19,7 +19,7 @@ def install_dependencies():
     try:
         print("Installing dependencies...")
         subprocess.run(["pip", "install", "-r", "requirements.txt"], check=True)
-        print("Dependencies installed successfully.")
+        print("All Dependencies installed successfully.")
     except subprocess.CalledProcessError:
         print("Error: Failed to install dependencies.")
     except Exception as e:

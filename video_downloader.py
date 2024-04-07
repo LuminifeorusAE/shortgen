@@ -2,7 +2,7 @@ import os
 import random
 import requests
 from tqdm import tqdm
-from ffprobe import FFProbe  
+from moviepy.editor import VideoFileClip  # Import VideoFileClip from moviepy
 import json
 import concurrent.futures
 
@@ -21,7 +21,7 @@ class VideoDownloader():
         Initialize the VideoDownloader object.
         """
         self.api_key = self.load_api_key()
-        self.themes = ["drone beach", "sunsets", "drone adriatic", "drone nature", "drone forest", "drone waterfall"]
+        self.themes = ["drone beach waves", "horizon", "drone adriatic sea", "beautiful nature drone", "drone forest", "night sky"]
         self.min_resolution = (1080, 1920)  # Set a minimum resolution (e.g., 720p)
 
     def get_api_response(self, url, headers):
@@ -80,25 +80,23 @@ class VideoDownloader():
             return None
 
     def get_video_metadata(self, filepath):
-        print("Getting video metadata...")
         """
-        Extract metadata from a video file using ffprobe.
+        Extract metadata from a video file using moviepy.
 
         Args:
             filepath (str): Path to the video file.
 
         Returns:
-            str: Resolution of the video in the format "width x height".
+            tuple: A tuple containing duration (in seconds) and resolution (e.g., "width x height").
         """
         try:
-            probe = FFProbe(filepath)
-            video_info = next(s for s in probe.streams if s.is_video())
-            resolution = f"{video_info.width}x{video_info.height}"
-            return resolution
+            clip = VideoFileClip(filepath)
+            duration = clip.duration
+            resolution = f"{clip.size[0]}x{clip.size[1]}"
+            return duration, resolution
         except Exception as e:
             print(f"Error extracting metadata from video: {e}")
-            return "Unknown"
-        
+            return None, None
         
     def load_api_key(self):
         print("Loading API key...")
@@ -273,7 +271,3 @@ if __name__ == "__main__":
         print(f"Total downloaded videos: {downloaded_count}")
     else:
         print("No videos found with resolutions higher than the minimum set resolution.")
-
-
-
-
