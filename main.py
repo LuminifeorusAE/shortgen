@@ -6,11 +6,18 @@ from merge import VideoMerger
 from music import VideoEditor
 import random
 import os
+from install_dependencies import install_dependencies, create_virtualenv, activate_virtualenv
+
 
 NUM_VIDEOS_TO_DOWNLOAD = 10  # Set the desired number of videos to download
 
 
+
+
 if __name__ == "__main__":
+    create_virtualenv()
+    activate_virtualenv()
+    install_dependencies()
     print("Initializing VideoDownloader instance...")
     downloader = VideoDownloader()
     theme = random.choice(downloader.themes)
@@ -77,7 +84,7 @@ if __name__ == "__main__":
         print("No videos found with resolutions higher than the minimum set resolution.")
 
     cutter = VideoCutter()
-    downloaded_video_paths, total_duration = cutter.cut_videos()
+    downloaded_video_paths = cutter.cut_videos()
 
     video_dir = "cut_videos" 
     output_path = "merged_video.mp4"  
