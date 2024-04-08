@@ -1,33 +1,22 @@
 import os
 from tiktok_uploader.upload import upload_video
-from OAuth_autorization import generate_title_and_description
 
-def tik_tok_upload():
-    # Get the current working directory
-    current_directory = os.getcwd()
+VIDEO_DIRECTORY = "final_videos"
 
-    # List all files in the current directory
-    files = os.listdir(current_directory)
+if __name__ == "__main__":
+    # Get a list of files in the directory
+    files = os.listdir(VIDEO_DIRECTORY)
 
     # Filter out only the .mp4 files
-    video_files = [file for file in files if file.endswith('.mp4')]
+    mp4_files = [file for file in files if file.endswith(".mp4")]
 
-    if not video_files:
-        print("No .mp4 files found in the current directory.")
-        return
+    if mp4_files:
+        # Take the first .mp4 file found
+        video_path = os.path.join(VIDEO_DIRECTORY, mp4_files[0])
 
-    # Iterate over each video file and upload
-    for video_file in video_files:
-        # Generate title and description dynamically for each video file
-        title, description = generate_title_and_description(video_file)
-
-        # Print out the generated title for each video
-        print(f"Generated Title for '{video_file}':")
-
-        # Upload the video with the dynamically generated title and description
-        upload_video(os.path.join(current_directory, video_file),
-                     description=description,
-                     cookies='cookies.txt')
-
-# Call the function
-tik_tok_upload()
+        # Upload the video to TikTok
+        upload_video(video_path,
+                     description="This is a video from the local directory",
+                     cookies="cookies.txt")
+    else:
+        print("No .mp4 files found in the directory.")
