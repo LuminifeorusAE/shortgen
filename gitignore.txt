@@ -6,12 +6,12 @@ __pycache__/
 # footages
 # cut_videos
 # merged_video
-# final_video
+# final_videos
 # .json
 
 # C extensions
 *.so
-json
+#json
 # Distribution / packaging
 .Python
 build/
@@ -41,7 +41,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-cookies.txt
+#cookies.txt
 
 # Unit test / coverage reports
 htmlcov/
