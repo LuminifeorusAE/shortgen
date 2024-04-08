@@ -2,11 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
-#files
-#footages
-#cut_videos
+# files
+# footages
+# cut_videos
 # merged_video
 # final_video
+# .json
 
 # C extensions
 *.so
@@ -157,8 +158,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 #APIs
-api
-client_secret
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
