@@ -9,6 +9,7 @@ from video_downloader import VideoDownloader
 from video_cutter import VideoCutter
 from merge import VideoMerger
 from music import VideoEditor
+from text_overlay import VideoTextOverlay
 from tik_tok_upload import TikTokUploader
 import random
 import os
@@ -141,6 +142,9 @@ if __name__ == "__main__":
         print("Videos deleted successfully.")
     else:
         print("No MP4 file found in 'final_videos' directory.")
+    
+    video_overlay = VideoTextOverlay("final_videos", "captions", "output_videos")
+    video_overlay.overlay_text_on_videos()
  # Create an instance of VideoUploader
-    uploader = TikTokUploader(video_directory="final_videos")
-    uploader.upload_first_video()
+    # uploader = TikTokUploader(video_directory="final_videos", captions_directory="captions")
+    # uploader.upload_first_video()
