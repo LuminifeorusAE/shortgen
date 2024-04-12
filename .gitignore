@@ -3,13 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 # files
- footages
- cut_videos
- merged_video
- final_videos
- .json
- pexels_api.json
- cookies.txt
+footages
+cut_videos
+merged_video
+final_videos
+.json
+pexels_api.json
+cookies.txt
 # C extensions
 *.so
 
