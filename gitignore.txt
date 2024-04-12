@@ -7,12 +7,12 @@ __pycache__/
  cut_videos
  merged_video
  final_videos
-.json
-
+ .json
+ pexels_api.json
 # C extensions
 *.so
 
-pexels_api.json
+
 # Distribution / packaging
 .Python
 build/
