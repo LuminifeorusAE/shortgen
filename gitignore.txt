@@ -3,16 +3,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 # files
-# footages
-# cut_videos
-# merged_video
-# final_videos
-# .json
+ footages
+ cut_videos
+ merged_video
+ final_videos
+.json
 
 # C extensions
 *.so
-#.json
-# pexels_api.json
+
+pexels_api.json
 # Distribution / packaging
 .Python
 build/
