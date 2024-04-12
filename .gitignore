@@ -9,6 +9,7 @@ __pycache__/
  final_videos
  .json
  pexels_api.json
+ cookies.txt
 # C extensions
 *.so
 
@@ -42,7 +43,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-#cookies.txt
+
 
 # Unit test / coverage reports
 htmlcov/
