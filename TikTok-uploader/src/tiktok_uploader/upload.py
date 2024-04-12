@@ -321,7 +321,7 @@ def _clear(element) -> None:
     element.send_keys(2 * len(element.text) * Keys.BACKSPACE)
 
 
-def _set_video(driver, path: str = '', num_retries: int = 3, **kwargs) -> None:
+def _set_video(driver, path: str = '', num_retries: int = 3, *args, **kwargs) -> None:
     """
     Sets the video to upload
 
@@ -330,45 +330,49 @@ def _set_video(driver, path: str = '', num_retries: int = 3, **kwargs) -> None:
     driver : selenium.webdriver
     path : str
         The path to the video to upload
-    num_retries : number of retries (can occasionally fail)
+    num_retries : int
+        Number of retries (can occasionally fail)
     """
-    # uploads the element
+    # Upload the video file
     logger.debug(green('Uploading video file'))
 
     for _ in range(num_retries):
         try:
+            # Switch to the upload iframe
             _change_to_upload_iframe(driver)
-            upload_box = driver.find_element(
-                By.XPATH, config['selectors']['upload']['upload_video']
-            )
+
+            # Locate the upload box and send the video path
+            upload_box = driver.find_element(By.XPATH, config['selectors']['upload']['upload_video'])
             upload_box.send_keys(path)
-            # waits for the upload progress bar to disappear
-            upload_finished = EC.presence_of_element_located(
-                (By.XPATH, config['selectors']['upload']['upload_finished'])
-                )
 
-            WebDriverWait(driver, config['explicit_wait']).until(upload_finished)
+            # Wait for the upload progress bar to disappear
+            WebDriverWait(driver, config['explicit_wait']).until_not(
+                EC.presence_of_element_located((By.XPATH, config['selectors']['upload']['upload_progress_bar']))
+            )
 
-            # waits for the video to upload
-            upload_confirmation = EC.presence_of_element_located(
-                (By.XPATH, config['selectors']['upload']['upload_confirmation'])
-                )
+            # Wait for the upload confirmation element to appear
+            WebDriverWait(driver, config['uploading_wait']).until(
+                EC.presence_of_element_located((By.XPATH, config['selectors']['upload']['upload_confirmation']))
+            )
 
-            # An exception throw here means the video failed to upload an a retry is needed
-            WebDriverWait(driver, config['uploading_wait']).until(upload_confirmation)
-
-            # wait until a non-draggable image is found
-            process_confirmation = EC.presence_of_element_located(
-                (By.XPATH, config['selectors']['upload']['process_confirmation'])
-                )
-            WebDriverWait(driver, config['explicit_wait']).until(process_confirmation)
+            # Wait for the process confirmation element to appear
+            WebDriverWait(driver, config['explicit_wait']).until(
+                EC.presence_of_element_located((By.XPATH, config['selectors']['upload']['process_confirmation']))
+            )
+            
+            logger.debug(green('Video uploaded successfully'))
             return
-        except TimeoutException as exception:
-            print("TimeoutException occurred:\n", exception)
-        except Exception as exception:
-            print(exception)
+        except TimeoutException as e:
+            logger.error(f"TimeoutException occurred: {e}")
+            # Log the timeout and continue with the next retry attempt
+            pass
+        except Exception as e:
+            logger.error(f"Exception occurred during upload: {e}")
+            # Log the exception and continue with the next retry attempt
+            pass
 
-    raise FailedToUpload()
+    # If all retry attempts fail, raise FailedToUpload exception
+    raise FailedToUpload("Failed to upload video after multiple retry attempts")
 
 def _remove_cookies_window(driver) -> None:
     """

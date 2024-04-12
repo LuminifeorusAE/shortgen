@@ -1,5 +1,5 @@
 import os
-import random
+
 from moviepy.editor import *
 
 class VideoTextOverlay:

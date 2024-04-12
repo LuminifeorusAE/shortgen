@@ -2,7 +2,7 @@ import os
 import random
 import requests
 from tqdm import tqdm
-from moviepy.editor import VideoFileClip  # Import VideoFileClip from moviepy
+from moviepy.editor import VideoFileClip 
 import json
 import concurrent.futures
 
@@ -22,7 +22,7 @@ class VideoDownloader():
         """
         self.api_key = self.load_api_key()
         self.themes = ["drone beach waves", "horizon", "drone adriatic sea", "beautiful nature drone", "drone forest", "night sky"]
-        self.min_resolution = (1080, 1920)  # Set a minimum resolution (e.g., 720p)
+        self.min_resolution = (1080, 1920) 
 
     def get_api_response(self, url, headers):
         """
