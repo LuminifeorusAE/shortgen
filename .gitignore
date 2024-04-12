@@ -2,9 +2,16 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+# files
+ footages
+ cut_videos
+ merged_video
+ final_videos
+ .json
+ pexels_api.json
 # C extensions
 *.so
+
 
 # Distribution / packaging
 .Python
@@ -35,6 +42,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+#cookies.txt
 
 # Unit test / coverage reports
 htmlcov/
@@ -151,7 +159,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
+#APIs
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
