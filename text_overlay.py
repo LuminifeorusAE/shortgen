@@ -29,6 +29,9 @@ class VideoTextOverlay:
         return text
 
     def overlay_text_on_videos(self):
+        if not os.path.exists(self.output_directory):
+            os.makedirs(self.output_directory)
+        
         files = os.listdir(self.video_directory)
         video_files = [file for file in files if file.endswith(".mp4")]
 
