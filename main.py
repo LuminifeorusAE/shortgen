@@ -67,7 +67,7 @@ if __name__ == "__main__":
                         continue  # Skip this video if already attempted
                     for link in video.get('video_files', []):
                         if 'hd_1920_1080' in link['link']:
-                            success = downloader.download_video(video, 'footages')
+                            success = downloader.download_videos(video, 'footages')
                             attempted_videos.add(video['id'])
                             if success:
                                 downloaded_count += 1
