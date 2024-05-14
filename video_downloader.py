@@ -17,33 +17,20 @@ class VideoDownloader():
 
     # This is the constructor method for the VideoDownloader class
     def __init__(self):
-
         print("Initializing Video Downloader...")
 
-        # initializing the api_key by loading it from a JSON file using the load_api_key method.
-        self.api_key = self.load_api_key()
+        # Initialize the api_key by accessing it from the environment variables
+        self.api_key = os.environ.get('PEXELS_API_KEY')
+        if not self.api_key:
+            raise EnvironmentError("PEXELS_API_KEY environment variable is not set. Please refer to the readme file on how to obtain and set up your API key.")
+
+
         # defines a list of themes to search for videos.
         self.themes = ["drone beach waves", "horizon", "drone adriatic sea", "beautiful nature drone", "drone forest", "night sky"]
          # sets a minimum resolution for the videos.
         self.min_resolution = (2560, 1440)
 
-    # This method load_api_key loads the API key from a JSON file.
-    def load_api_key(self):
-        print("Loading API key...")
-        """
-        Load the API key from a JSON file.
-        """
-        # attempts to open the file pexels_api.json and load its contents as JSON.
-        try:
-            with open('pexels_api.json') as file:
-                # returns the value of the "pexels_api_key" key from the loaded JSON data
-                config = json.load(file)
-                print("Valid API key...")
-                return config['pexels_api_key']
-        #If the file is not found or the key is not present, it prints an error message and returns None
-        except(FileNotFoundError,KeyError) as e:
-            print(f"Error loading API key: {e}")
-            return None
+    
 
 
     #This method get_api_response takes a URL and headers as input and makes an HTTP GET request to the specified URL with the provided headers.
