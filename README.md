@@ -1,23 +1,22 @@
 # Video Uploader
 
+A brief description of your project.
 
+## Getting Started
 
-## Getting started
+To start using the Video Uploader project, follow the steps below:
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
+### Add your files
 
 - [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
 - [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
-```
+```bash
 cd existing_repo
-git remote add origin https://gitlab.com/shortgen1/video-uploader.git
+git remote add origin https://gitlab.com/yourusername/video-uploader.git
 git branch -M main
 git push -uf origin main
+
 ```
 
 ## Integrate with your tools
@@ -52,29 +51,51 @@ When you're ready to make this README your own, just edit this file and use the 
 
 Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
-## Name
-Choose a self-explaining name for your project.
+# Social Media Reels Uploader
+This Python script generates short reels for TikTok and uploads them to Instagram, YouTube, and Twitter. Currently, the TikTok part is implemented, while the YouTube and Instagram functionalities need to be fixed.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## Introduction
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+This project serves as an educational endeavor to explore social media automation using Python. The script automates the creation and uploading of short reels to multiple platforms, facilitating content creation and distribution.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Features
+
+- Generates short reels for TikTok.
+- Planned support for uploading reels to Instagram, YouTube, and Twitter.
+
+### Prerequisites
+
+- Python 3.x installed on your system.
+- Required Python packages (TBD once the Instagram and YouTube functionalities are implemented).
+
+### Installation
+
+1. Clone this repository:
+
+   ```bash
+   git clone https://github.com/yourusername/social-media-reels-uploader.git.
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+just run main.py and it will install all requiroment libraries and will start make videos like in this TikTok channel https://www.tiktok.com/@aerialharmony
+
+if you got a problems
+
+- run  pip install -r requirements. txt in your terminal
+- make sure you created virtual enviroment and activated it (when you run main py it should do all the work usualy)
+- make sure you properly installed ffmpeg and imagemagic in your PC enviroment variables
+if not here is a links by step by step tutorial for how to do it
+- Install imagemagick on your pc https://imagemagick.org/script/download.php
+-   Step 1: Download FFmpeg for Windows. Visit the FFmpeg download page. ...
+    Step 2: Extract the Downloaded Files. Once downloaded, extract the contents: ...
+    Step 3: Add FFmpeg to PATH. Set Windows environment variables to add FFmpeg to the PATH. ...
+    Step 4: Verify FFmpeg PATH.
 
 ## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+dtadevosyan53@gmail.com
 
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+I want to make api support for instagramm facebook youtube in the future updates
 
 ## Contributing
 State if you are open to contributions and what your requirements are for accepting them.
@@ -84,10 +105,12 @@ For people who want to make changes to your project, it's helpful to have some d
 You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Autors
+- Georgi Khalatyan .
+- David Tadevosyan.
 
 ## License
-For open source projects, say how it is licensed.
+The Apache License 2.0
 
 ## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+In Development

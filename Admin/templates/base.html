@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="bg-dark text-white p-4">
+        <h1 class="text-center">Admin Panel</h1>
+    </header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Videos</a>
+                </li>
+                <!-- Add more navigation links here as needed -->
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <section>
+            <h2 class="mb-4">Social Network Statistics</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Add a canvas element for the chart -->
+                    <canvas id="socialNetworkChart" width="1000" height="600"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="mb-4">Video Analytics</h2>
+            <ul class="list-group">
+                <li class="list-group-item">Daily Views: <!-- Add code to display daily views --></li>
+                <li class="list-group-item">Comments: <!-- Add code to display total comments --></li>
+                <li class="list-group-item">Shares: <!-- Add code to display total shares --></li>
+                <li class="list-group-item">Engagement Rate: <!-- Add code to calculate and display engagement rate --></li>
+                <li class="list-group-item">Top Performing Videos: <!-- Add code to display top performing videos --></li>
+                <li class="list-group-item">User Feedback: <!-- Add code to display user feedback section --></li>
+                <li class="list-group-item">Content Recommendations: <!-- Add code to display content recommendations --></li>
+                <li class="list-group-item">Monetization Insights: <!-- Add code to display monetization metrics --></li>
+            </ul>
+        </section>
+    </div>
+
+    <footer class="bg-dark text-white p-4 mt-4">
+        <p class="text-center">&copy; 2024 Admin Panel</p>
+    </footer>
+
+    <!-- JavaScript code for Chart.js -->
+    <script>
+        var ctx = document.getElementById('socialNetworkChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['TikTok Subscribers', 'Instagram Followers', 'YouTube Subscribers'],
+                datasets: [{
+                    label: 'Social Network Statistics',
+                    data: [{{ tiktok_subscribers }}, {{ instagram_followers }}, {{ youtube_subscribers }}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth:1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+</body>
+</html>
