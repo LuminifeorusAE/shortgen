@@ -9,7 +9,7 @@ merged_video
 final_videos
 .json
 pexels_api.json
-cookies.txt
+cookies
 # C extensions
 *.so
 
