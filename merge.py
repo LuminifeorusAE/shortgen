@@ -9,7 +9,7 @@ class VideoMerger:
         self.video_dir = video_dir
         self.output_path = output_path
 
-    def adujust_video_parameters(self, video_path, output_path, aspect_ratio =(9,16)):
+    def adjust_video_parameters(self, video_path, output_path, aspect_ratio =(9,16)):
         """• Function is defined to adjust differend video parameters as aspect ratio, codecs and fps to each outher
            • These lines calculate the dimensions for center cropping the video based on the specified aspect ratio. 
             It ensures that the cropped video maintains the aspect ratio while maximizing the dimensions.
@@ -81,7 +81,7 @@ class VideoMerger:
             adjusted_video_path = os.path.join(output_directory, f"{os.path.splitext(video_file)[0]}_adjusted.mp4")
 
             # adjusting all the video clips to each other
-            self.adujust_video_parameters(video_path, adjusted_video_path, aspect_ratio = (9,16))
+            self.adjust_video_parameters(video_path, adjusted_video_path, aspect_ratio = (9,16))
             #joining to make one single video clip to list
             clips.append(VideoFileClip(adjusted_video_path))
 
@@ -100,6 +100,6 @@ if __name__ == "__main__":
     output_path = "merged_video.mp4"
     # calling created class with function 
     merger = VideoMerger(video_dir, output_path)
-    merger.merge_videos
+    merger.merge_videos()
 
 

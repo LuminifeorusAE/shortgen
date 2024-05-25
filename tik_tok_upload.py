@@ -2,8 +2,11 @@ import os
 from tiktok_uploader.upload import upload_video
 # from selenium.webdriver.chrome.options import Options
 
+#line where you retrieve the cookies file path
+cookies_file = os.getenv('COOKIES_FILE')
+
 class TikTokUploader:
-    def __init__(self, video_directory, captions_directory, cookies_file="cookies.txt"):
+    def __init__(self, video_directory, captions_directory, cookies_file):
         self.video_directory = video_directory
         self.captions_directory = captions_directory
         self.cookies_file = cookies_file
@@ -72,6 +75,7 @@ class TikTokUploader:
             upload_video(video_path,
                          description=caption,
                          cookies=self.cookies_file,
+                         copyright = True
                         #  options=options,
                         #  headless=True
             )
@@ -79,5 +83,5 @@ class TikTokUploader:
             print("No .mp4 files found in the directory.")
 
 if __name__ == "__main__":
-    uploader = TikTokUploader(video_directory="output_videos", captions_directory="tags")
+    uploader = TikTokUploader(video_directory="output_videos", captions_directory="tags" ,cookies_file=cookies_file)
     uploader._upload_video_in_directory()

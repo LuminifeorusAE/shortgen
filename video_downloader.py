@@ -1,5 +1,5 @@
 import concurrent.futures # using to make multiple api calls reach more than default 80 videos
-import json # using to store and interact pexels.com API 
+
 import os # creates folder for downloading videos in it
 import random # to select random videos from website
 import requests # using to get api responce for downloading videos
@@ -20,7 +20,7 @@ class VideoDownloader():
         print("Initializing Video Downloader...")
 
         # Initialize the api_key by accessing it from the environment variables
-        self.api_key = os.environ.get('PEXELS_API_KEY')
+        self.api_key = os.getenv('PEXELS_API_KEY')
         if not self.api_key:
             raise EnvironmentError("PEXELS_API_KEY environment variable is not set. Please refer to the readme file on how to obtain and set up your API key.")
 

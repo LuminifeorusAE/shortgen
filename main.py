@@ -1,8 +1,8 @@
 #main.py
-from install_dependencies import install_dependencies, create_virtualenv, activate_virtualenv
-create_virtualenv()
-activate_virtualenv()
-install_dependencies()
+# from install_dependencies import install_dependencies, create_virtualenv, activate_virtualenv
+# create_virtualenv()
+# activate_virtualenv()
+# install_dependencies()
 print("Initializing VideoDownloader instance...")
 
 from video_downloader import VideoDownloader
@@ -145,5 +145,5 @@ if __name__ == "__main__":
     
     video_overlay = VideoTextOverlay("final_videos", "captions", "output_videos")
     video_overlay.overlay_text_on_videos()
-    uploader = TikTokUploader(video_directory="output_videos", captions_directory="tags")
-    uploader._upload_video_in_directory()
+    # uploader = TikTokUploader(video_directory="output_videos", captions_directory="tags")
+    # uploader._upload_video_in_directory()

@@ -91,6 +91,53 @@ if not here is a links by step by step tutorial for how to do it
     Step 3: Add FFmpeg to PATH. Set Windows environment variables to add FFmpeg to the PATH. ...
     Step 4: Verify FFmpeg PATH.
 
+To upload your video to your tiktok account you need to
+- copy your cookies in the text file and name it cookies.txt
+- store it in the same directory as executable file
+or 
+- add them in your terminal enviroment variables
+For bash
+command 
+- cd ~
+open your shell config file 
+Add the export command for your environment variable at the end of the file
+
+- nano ~/.bashrc
+write
+- export TIKTOK_COOKIES_FILE="/path/to/your/cookies.txt"
+- reload your shell
+
+to write your api key to your enviroment variables you need to
+- nano ~/.bashrc
+write
+- export PEXELS_API_KEY = "your api key"
+- reload your shell
+
+for POWERSHELL
+
+
+
+- Open PowerShell.
+
+command
+
+- Use the Set-Item cmdlet to set the environment variable. For example:
+
+- Set-Item -Path Env:TIKTOK_COOKIES_FILE -Value "D:\projects\video-uploader\cookies.txt"
+
+- Get-Item Env:TIKTOK_COOKIES_FILE
+
+You should see the path you specified printed to the console.
+
+
+- notepad $PROFILE
+
+write 
+
+$env:TIKTOK_COOKIES_FILE = "D:\projects\video-uploader\cookies.txt"(or your path)
+$env:PEXELS_API_KEY = 'your api key'
+
+
 ## Support
 dtadevosyan53@gmail.com
 
