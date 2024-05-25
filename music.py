@@ -35,7 +35,6 @@ class VideoEditor:
         Args:
             output_filename (str): Name of the output video file with the added music.
             fade_duration (float): Duration (in seconds) of the fade-out effect applied to the music.
-
         """
         # Load video clip
         print("Attempting to load video from path:", self.video_path)
@@ -99,7 +98,11 @@ class VideoEditor:
         """
         if os.path.exists(index_file):
             with open(index_file, 'r') as f:
-                last_chosen_index = int(f.read().strip())
+                content = f.read().strip()
+                if content:
+                    last_chosen_index = int(content)
+                else:
+                    last_chosen_index = 0
         else:
             last_chosen_index = 0
         return last_chosen_index

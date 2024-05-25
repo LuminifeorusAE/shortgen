@@ -145,5 +145,5 @@ if __name__ == "__main__":
     
     video_overlay = VideoTextOverlay("final_videos", "captions", "output_videos")
     video_overlay.overlay_text_on_videos()
-    # uploader = TikTokUploader(video_directory="output_videos", captions_directory="tags")
-    # uploader._upload_video_in_directory()
+    uploader = TikTokUploader(video_directory="output_videos", captions_directory="tags")
+    uploader._upload_video_in_directory()
